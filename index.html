@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Fintech App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="text-[#F5F7FA] font-sans antialiased bg-[#0F1115] flex justify-center items-center min-h-[100dvh]">
+
+    <div class="app-container relative flex flex-col bg-transparent">
+        
+        <!-- ШАПКА -->
+        <header id="main-header" class="absolute top-[env(safe-area-inset-top,0px)] left-0 right-0 h-[54px] px-4 flex justify-between items-end pb-[10px] z-50 pointer-events-none">
+            <!-- Содержимое рендерится через JS -->
+        </header>
+
+        <!-- КОНТЕНТ -->
+        <div class="flex-1 overflow-y-auto hide-scrollbar relative pt-[74px]">
+            
+            <!-- ЭКРАН 1: HOME -->
+            <main id="screen-home" class="pb-32 flex flex-col">
+                
+                <!-- БЛОК NET WORTH -->
+                <div class="flex flex-col items-center mb-[24px] py-[32px] px-4">
+                    <p class="text-[#8B93A7] text-[16px] font-semibold leading-[19px] mb-2">Net Worth</p>
+                    <div class="flex items-center justify-center mb-2">
+                        <h1 id="net-worth-amount" class="text-[#F5F7FA] text-[48px] font-bold leading-[58px] tracking-tight">0,00</h1>
+                        <span class="text-[#8B93A7] text-[36px] font-bold leading-[44px] ml-2 mt-1">$</span>
+                    </div>
+                    <p class="text-[16px] font-medium leading-[19px]">
+                        <span class="text-[#FF6B6B]" id="net-worth-delta">−12,09 $</span> 
+                        <span class="text-[#8B93A7] ml-1">24h</span>
+                    </p>
+                </div>
+
+                <!-- БЛОК ASSETS (Скролл с отступами) -->
+                <div id="block-assets" class="mb-4 hidden">
+                    <h2 class="text-[20px] font-semibold leading-[24px] text-[#F5F7FA] mb-4 px-4">Assets</h2>
+                    <!-- px-4 внутри скролла, чтобы скругления не обрезались, и -mx-4, чтобы компенсировать внешние отступы -->
+                    <div class="flex gap-[10px] overflow-x-auto hide-scrollbar pb-2 px-4 -mx-0" id="home-assets-list"></div>
+                </div>
+
+                <!-- OWED TO ME -->
+                <div id="block-owed" class="mb-[40px] hidden px-4">
+                    <div class="glass-ui rounded-[32px] p-5 flex flex-col h-[143px] justify-between w-full">
+                        <div class="flex items-center gap-3">
+                            <div class="w-[44px] h-[44px] rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]">
+                                <i class="ph ph-clock text-lg"></i>
+                            </div>
+                            <span class="font-medium text-[16px]">Owed to me</span>
+                        </div>
+                        <p class="text-[32px] font-bold leading-none" id="total-owed">0,00 <span class="text-[#8B93A7] text-[18px]">$</span></p>
+                    </div>
+                </div>
+
+                <!-- DEBTS -->
+                <div id="block-debts" class="mb-8 hidden px-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-[20px] font-semibold leading-[24px]">Debts <i class="ph ph-caret-up text-[16px] text-[#8B93A7]"></i></h2>
+                        <span class="text-[#8B93A7] text-[15px] font-medium" id="total-debts">−0,00 $</span>
+                    </div>
+                    <div id="home-debts-list" class="flex flex-col gap-[10px]"></div>
+                </div>
+            </main>
+
+            <!-- ЭКРАН 2: ACCOUNTS -->
+            <main id="screen-accounts" class="px-4 pb-32 hidden">
+                <div class="glass-ui p-1 rounded-full flex mb-8">
+                    <button class="flex-1 py-2.5 rounded-full bg-[#232730] text-white text-[15px] font-medium shadow-sm">Assets</button>
+                    <button class="flex-1 py-2.5 rounded-full text-[#8B93A7] text-[15px] font-medium">Debts</button>
+                </div>
+
+                <div class="flex gap-3 overflow-x-auto hide-scrollbar mb-8">
+                    <button class="px-5 py-2.5 rounded-full bg-[#4C8DFF] text-white text-[15px] font-medium flex items-center gap-2 whitespace-nowrap shadow-[0_4px_12px_rgba(76,141,255,0.3)]">
+                        <i class="ph ph-wallet"></i> Cash
+                    </button>
+                    <button class="px-5 py-2.5 rounded-full glass-ui text-[#8B93A7] text-[15px] font-medium flex items-center gap-2 whitespace-nowrap">
+                        <i class="ph ph-credit-card"></i> Bank Accounts
+                    </button>
+                </div>
+
+                <div id="accounts-list" class="flex flex-col gap-4"></div>
+            </main>
+
+            <!-- ЭКРАН 3: HISTORY -->
+            <main id="screen-history" class="px-4 pb-32 hidden">
+                <div id="history-list"></div>
+            </main>
+        </div>
+
+        <!-- ПЛАВАЮЩИЙ ТАББАР -->
+        <div class="absolute bottom-6 left-0 right-0 px-4 flex justify-between items-end z-40 pointer-events-none">
+            <div class="glass-ui rounded-full flex items-center p-1.5 flex-1 mr-4 h-[68px] relative pointer-events-auto">
+                <button onclick="switchTab('home')" id="tab-home" class="tab-btn flex-1 flex flex-col items-center justify-center h-full rounded-full transition-all text-[#4C8DFF] active">
+                    <i class="ph-fill ph-house text-[22px] mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Home</span>
+                </button>
+                <button onclick="switchTab('accounts')" id="tab-accounts" class="tab-btn flex-1 flex flex-col items-center justify-center h-full rounded-full transition-all text-[#8B93A7]">
+                    <i class="ph ph-credit-card text-[22px] mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Accounts</span>
+                </button>
+                <button onclick="switchTab('history')" id="tab-history" class="tab-btn flex-1 flex flex-col items-center justify-center h-full rounded-full transition-all text-[#8B93A7]">
+                    <i class="ph ph-clock text-[22px] mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">History</span>
+                </button>
+            </div>
+            <button onclick="openModal('modal-add-tx')" class="w-[68px] h-[68px] rounded-full bg-[#4C8DFF] flex items-center justify-center text-white shadow-[0_8px_24px_rgba(76,141,255,0.4)] active:scale-95 transition-transform pointer-events-auto">
+                <i class="ph ph-plus text-[32px]"></i>
+            </button>
+        </div>
+
+        <!-- МОДАЛКИ -->
+        <div id="modal-add-tx" class="modal-overlay hidden fixed inset-0 z-50 flex flex-col justify-end">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal('modal-add-tx')"></div>
+            <div class="modal-content glass-ui w-full rounded-t-[32px] p-6 relative z-10 pb-12 max-w-[440px] mx-auto">
+                <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="closeModal('modal-add-tx')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
+                    <h2 class="text-[18px] font-semibold">Add Transaction</h2>
+                    <button onclick="saveTransaction()" class="text-[#4C8DFF] font-semibold text-[16px]">Save</button>
+                </div>
+                <div class="bg-[#232730] p-1 rounded-full flex mb-10">
+                    <button id="btn-expense" onclick="setTxType('expense')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm">Expense</button>
+                    <button id="btn-income" onclick="setTxType('income')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium">Income</button>
+                </div>
+                <div class="text-center mb-10">
+                    <input type="number" id="tx-amount" placeholder="0" class="bg-transparent text-[64px] font-bold text-center w-full outline-none placeholder:text-[#8B93A7] leading-none">
+                </div>
+                <div class="mb-6">
+                    <label class="text-[14px] text-[#8B93A7] mb-2 block font-medium">Account</label>
+                    <select id="tx-account" class="w-full bg-[#232730] border border-white/5 rounded-[16px] p-4 text-white outline-none appearance-none text-[16px]"></select>
+                </div>
+                <div class="mb-8">
+                    <label class="text-[14px] text-[#8B93A7] mb-2 block font-medium">Note</label>
+                    <input type="text" id="tx-note" placeholder="Coffee..." class="w-full bg-[#232730] border border-white/5 rounded-[16px] p-4 text-white outline-none placeholder:text-[#8B93A7] text-[16px]">
+                </div>
+                <button onclick="saveTransaction()" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px] active:scale-95 transition-transform">Confirm</button>
+            </div>
+        </div>
+
+        <div id="modal-add-account" class="modal-overlay hidden fixed inset-0 z-50 flex flex-col justify-end">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal('modal-add-account')"></div>
+            <div class="modal-content glass-ui w-full rounded-t-[32px] p-6 relative z-10 text-center pb-12 max-w-[440px] mx-auto">
+                <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-8"></div>
+                <i class="ph ph-lock-key text-[48px] text-white mb-4"></i>
+                <h2 class="text-[22px] font-bold mb-2">Under construction</h2>
+                <p class="text-[#8B93A7] text-[15px] mb-8">This feature will be available soon</p>
+                <button onclick="closeModal('modal-add-account')" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px]">Close</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
