@@ -27,20 +27,11 @@ html, body {
 }
 
 /* =========================================
-   ФОНЫ СТРАНИЦЫ (Градиенты состояний)
+   ФОН — плоский, без градиентов
    ========================================= */
 body {
-    background-color: #0F1115;
-    background-image: linear-gradient(180deg, rgba(139, 147, 167, 0.08) 0%, rgba(139, 147, 167, 0) 100%);
-    background-repeat: no-repeat;
-    background-size: 100% 50vh;
-    background-position: top;
-    transition: background-image 0.5s ease;
+    background-color: #171A1F;
 }
-
-body.bg-positive { background-image: linear-gradient(180deg, rgba(46, 204, 113, 0.08) 0%, rgba(46, 204, 113, 0) 100%); }
-body.bg-negative { background-image: linear-gradient(180deg, rgba(255, 107, 107, 0.08) 0%, rgba(255, 107, 107, 0) 100%); }
-body.bg-neutral { background-image: linear-gradient(180deg, rgba(139, 147, 167, 0.08) 0%, rgba(139, 147, 167, 0) 100%); }
 
 /* =========================================
    ЛЕЙАУТ (Резиновый под мобилки и Десктоп)
@@ -53,27 +44,24 @@ body.bg-neutral { background-image: linear-gradient(180deg, rgba(139, 147, 167, 
     position: relative;
 }
 
-@media (min-width: 768px) {
-    body { background-color: #000; }
-    
+@media (min-width: 1280px) {
+    /* Подложка за островом — на несколько тонов темнее приложения.
+       Tailwind-класс bg-[#171A1F] на body перебивается только через !important */
+    body { background-color: #0F1115 !important; }
+
     .app-container {
-        width: 440px;
-        height: 956px;
-        max-height: 95vh; 
-        background-color: #0F1115; 
-        border-radius: 44px; 
-        border: 8px solid #1A1D24; 
-        box-shadow: 0 0 0 2px #333, 0 20px 40px rgba(0,0,0,0.5);
-        overflow: hidden; 
-        background-image: linear-gradient(180deg, rgba(139, 147, 167, 0.08) 0%, rgba(139, 147, 167, 0) 100%);
-        background-repeat: no-repeat;
-        background-size: 100% 50vh;
-        background-position: top;
+        position: relative;
+        width: 375px;
+        height: 812px;
+        max-height: 100dvh;
+        border-radius: 44px;
+        background-color: #171A1F;
+        overflow: hidden;
     }
 
-    body.bg-positive .app-container { background-image: linear-gradient(180deg, rgba(46, 204, 113, 0.08) 0%, rgba(46, 204, 113, 0) 100%); }
-    body.bg-negative .app-container { background-image: linear-gradient(180deg, rgba(255, 107, 107, 0.08) 0%, rgba(255, 107, 107, 0) 100%); }
-    body.bg-neutral .app-container { background-image: linear-gradient(180deg, rgba(139, 147, 167, 0.08) 0%, rgba(139, 147, 167, 0) 100%); }
+    /* Модалки живут внутри острова, а не на весь вьюпорт.
+       Специфичнее Tailwind-класса .fixed в разметке */
+    .app-container .modal-overlay { position: absolute !important; }
 }
 
 /* =========================================
@@ -107,15 +95,23 @@ body.bg-neutral { background-image: linear-gradient(180deg, rgba(139, 147, 167, 
 /* =========================================
    АНИМАЦИИ МОДАЛОК
    ========================================= */
-.modal-overlay { transition: opacity 0.3s ease; opacity: 0; }
-.modal-content { transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.modal-overlay { transition: opacity 0.3s cubic-bezier(0.32, 0.72, 0, 1); opacity: 0; }
+.modal-content { transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1); will-change: transform; }
 .modal-overlay.active { opacity: 1; }
 .modal-overlay.active .modal-content { transform: translateY(0); }
 
 /* =========================================
    АКТИВНАЯ ВКЛАДКА ТАББАРА
    ========================================= */
-.tab-btn.active {
-    background-color: rgba(76, 141, 255, 0.15);
-    color: #4C8DFF;
+/* Подсветка активного таба — ездящая пилюля (см. updateTabIndicator в app.js) */
+#tab-indicator {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 0;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), width 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    pointer-events: none;
 }
