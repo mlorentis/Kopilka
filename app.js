@@ -239,7 +239,7 @@ function renderAccounts() {
                 <div class="h-4"></div>
                 <h2 class="text-[22px] font-semibold">Add your first account</h2>
                 <div class="h-2"></div>
-                <p class="text-[#8B93A7] text-[15px]">Track cash, cards, or crypto in one place</p>
+                <p class="text-[#8B93A7] text-[14px] leading-[17px] font-normal">Track cash, cards, or crypto in one place</p>
                 <div class="h-6"></div>
                 <button onclick="openAccountModal()" class="glass-ui text-white font-semibold text-[15px] h-[44px] px-6 rounded-full flex items-center gap-2 active:scale-95 transition-transform">${SVG_PLUS_16} Add Account</button>
             </div>
@@ -490,7 +490,7 @@ function renderHistory() {
                 <div class="h-4"></div>
                 <h2 class="text-[22px] font-semibold">Add your first account</h2>
                 <div class="h-2"></div>
-                <p class="text-[#8B93A7] text-[15px]">Track cash, cards, or crypto in one place</p>
+                <p class="text-[#8B93A7] text-[14px] leading-[17px] font-normal">Track cash, cards, or crypto in one place</p>
                 <div class="h-6"></div>
                 <button onclick="openAccountModal()" class="glass-ui text-white font-semibold text-[15px] h-[44px] px-6 rounded-full flex items-center gap-2 active:scale-95 transition-transform">${SVG_PLUS_16} Add Account</button>
             </div>
@@ -505,7 +505,7 @@ function renderHistory() {
                 <div class="h-4"></div>
                 <h2 class="text-[22px] font-semibold">No transaction yet</h2>
                 <div class="h-2"></div>
-                <p class="text-[#8B93A7] text-[15px]">Add your first income or expense to see it here</p>
+                <p class="text-[#8B93A7] text-[14px] leading-[17px] font-normal">Add your first income or expense to see it here</p>
                 <div class="h-6"></div>
                 <button onclick="openTxModal()" class="glass-ui text-white font-semibold text-[15px] h-[44px] px-6 rounded-full flex items-center gap-2 active:scale-95 transition-transform">${SVG_PLUS_16} Add Transaction</button>
             </div>
@@ -683,8 +683,9 @@ function attachSwipeToClose(modal) {
     // Только свайп за верхнюю зону (шапку с ручкой) — внизу контент скроллится
     content.addEventListener('touchstart', e => {
         if (modal.classList.contains('hidden')) return;
-        // Если контент проскроллен вниз — даём нативный скролл, свайп не начинаем
-        if (content.scrollTop > 0) return;
+        // Скролл теперь во вложенном контейнере — проверяем его прокрутку
+        const scroller = content.querySelector('.overflow-y-auto') || content;
+        if (scroller.scrollTop > 0) return;
         swipeState.active = true;
         swipeState.startY = e.touches[0].clientY;
         swipeState.currentY = 0;
@@ -739,10 +740,10 @@ function openTxModal() {
     currentTxType = 'expense';
     setTxType('expense');
 
-    const step1 = document.getElementById('tx-step-1');
-    const step2 = document.getElementById('tx-step-2');
-    step1.classList.remove('hidden');
-    step2.classList.add('hidden');
+    document.getElementById('tx-step-1').classList.remove('hidden');
+    document.getElementById('tx-step-2').classList.add('hidden');
+    document.getElementById('tx-step-1-head').classList.remove('hidden');
+    document.getElementById('tx-step-2-head').classList.add('hidden');
 
     const list = document.getElementById('tx-accounts-list');
     list.innerHTML = '';
@@ -768,6 +769,8 @@ function selectTxAccount(id) {
 
     document.getElementById('tx-step-1').classList.add('hidden');
     document.getElementById('tx-step-2').classList.remove('hidden');
+    document.getElementById('tx-step-1-head').classList.add('hidden');
+    document.getElementById('tx-step-2-head').classList.remove('hidden');
     document.getElementById('tx-selected-account').innerText = acc.name;
 
     // Чипы валют — только из валют выбранного счёта
@@ -790,6 +793,8 @@ function selectTxAccount(id) {
 function backToTxStep1() {
     document.getElementById('tx-step-2').classList.add('hidden');
     document.getElementById('tx-step-1').classList.remove('hidden');
+    document.getElementById('tx-step-2-head').classList.add('hidden');
+    document.getElementById('tx-step-1-head').classList.remove('hidden');
 }
 
 function setTxType(type) {

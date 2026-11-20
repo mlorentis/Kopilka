@@ -95,10 +95,17 @@ body {
 /* =========================================
    АНИМАЦИИ МОДАЛОК
    ========================================= */
-.modal-overlay { transition: opacity 0.3s cubic-bezier(0.32, 0.72, 0, 1); opacity: 0; }
-.modal-content { transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1); will-change: transform; }
+.modal-overlay { transition: opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1); opacity: 0; }
+.modal-content { transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1); will-change: transform; }
 .modal-overlay.active { opacity: 1; }
 .modal-overlay.active .modal-content { transform: translateY(0); }
+
+/* Фиксированная шапка модалки: контент скроллится под неё */
+.modal-header {
+    background-color: rgba(23, 26, 31, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
 
 /* =========================================
    АКТИВНАЯ ВКЛАДКА ТАББАРА

@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- iOS PWA: статус-бар прозрачный, контент уходит под него -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#171A1F">
+    <!-- PWA: имя, иконки -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <title>Fintech App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -46,7 +54,7 @@
                     <div class="h-4"></div>
                     <h2 class="text-[22px] font-semibold">Add your first account</h2>
                     <div class="h-2"></div>
-                    <p class="text-[#8B93A7] text-[15px]">Track cash, cards, or crypto in one place</p>
+                    <p class="text-[#8B93A7] text-[14px] leading-[17px] font-normal">Track cash, cards, or crypto in one place</p>
                     <div class="h-6"></div>
                     <button onclick="openAccountModal()" class="glass-ui text-white font-semibold text-[15px] h-[44px] px-6 rounded-full flex items-center gap-2 active:scale-95 transition-transform">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -137,27 +145,32 @@
         <!-- МОДАЛКА ТРАНЗАКЦИИ: 2 ШАГА -->
         <div id="modal-add-tx" class="modal-overlay hidden fixed inset-0 z-50">
             <div class="absolute inset-0 bg-[#0F1115]/60 backdrop-blur-[50px]" onclick="closeModal('modal-add-tx')"></div>
-            <div class="modal-content glass-ui absolute inset-x-0 top-4 bottom-0 rounded-t-[38px] p-6 z-10 pb-12 overflow-y-auto hide-scrollbar">
-                <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
-
-                <!-- ШАГ 1: выбор счёта -->
-                <div id="tx-step-1">
-                    <div class="flex justify-between items-center mb-8">
+            <div class="modal-content glass-ui absolute inset-x-0 top-0 bottom-0 rounded-t-[38px] z-10 flex flex-col overflow-hidden">
+                <!-- ФИКС ШАПКА -->
+                <div class="modal-header shrink-0 px-6 pt-3 pb-4">
+                    <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+                    <div id="tx-step-1-head" class="flex justify-between items-center">
                         <button onclick="closeModal('modal-add-tx')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
                         <h2 class="text-[18px] font-semibold">Select Account</h2>
                         <div class="w-10"></div>
                     </div>
-                    <div id="tx-accounts-list"></div>
-                </div>
-
-                <!-- ШАГ 2: валюта + сумма + тип + заметка -->
-                <div id="tx-step-2" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
+                    <div id="tx-step-2-head" class="hidden flex justify-between items-center">
                         <button onclick="backToTxStep1()" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-arrow-left text-xl"></i></button>
                         <h2 class="text-[18px] font-semibold">Add Transaction</h2>
                         <div class="w-10"></div>
                     </div>
-                    <p class="text-center text-[#8B93A7] text-[14px] mb-6">to <span id="tx-selected-account" class="text-[#F5F7FA] font-medium"></span></p>
+                </div>
+
+                <!-- СКРОЛЛ-КОНТЕНТ -->
+                <div class="flex-1 overflow-y-auto hide-scrollbar px-6 pb-12">
+                    <!-- ШАГ 1: выбор счёта -->
+                    <div id="tx-step-1">
+                        <div id="tx-accounts-list"></div>
+                    </div>
+
+                    <!-- ШАГ 2: валюта + сумма + тип + заметка -->
+                    <div id="tx-step-2" class="hidden">
+                        <p class="text-center text-[#8B93A7] text-[14px] mb-6 pt-2">to <span id="tx-selected-account" class="text-[#F5F7FA] font-medium"></span></p>
                     <div class="flex justify-center gap-2 mb-8" id="tx-currency-chips"></div>
                     <div class="bg-[#232730] p-1 rounded-full flex mb-8">
                         <button id="btn-expense" onclick="setTxType('expense')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm">Expense</button>
@@ -174,6 +187,7 @@
                         <input type="text" id="tx-note" placeholder="Coffee..." class="w-full bg-[#232730] border border-white/5 rounded-[16px] p-4 text-white outline-none placeholder:text-[#8B93A7] text-[16px]">
                     </div>
                     <button onclick="saveTransaction()" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px] active:scale-95 transition-transform">Confirm</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -181,14 +195,20 @@
         <!-- МОДАЛКА ADD / EDIT ACCOUNT -->
         <div id="modal-add-account" class="modal-overlay hidden fixed inset-0 z-50">
             <div class="absolute inset-0 bg-[#0F1115]/60 backdrop-blur-[50px]" onclick="closeModal('modal-add-account')"></div>
-            <div class="modal-content glass-ui absolute inset-x-0 top-4 bottom-0 rounded-t-[38px] p-6 z-10 pb-12 overflow-y-auto hide-scrollbar">
-                <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
-                <div class="flex justify-between items-center mb-8">
-                    <button id="acc-modal-close" onclick="closeModal('modal-add-account')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
-                    <h2 id="acc-modal-title" class="text-[18px] font-semibold">Add Account</h2>
-                    <button id="acc-save-btn" onclick="saveAccount()" class="w-10 h-10 rounded-full bg-[#232730] text-[#8B93A7] flex items-center justify-center transition-transform"><i class="ph ph-check text-xl"></i></button>
+            <div class="modal-content glass-ui absolute inset-x-0 top-0 bottom-0 rounded-t-[38px] z-10 flex flex-col overflow-hidden">
+                <!-- ФИКС ШАПКА -->
+                <div class="modal-header shrink-0 px-6 pt-3 pb-4">
+                    <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+                    <div class="flex justify-between items-center">
+                        <button id="acc-modal-close" onclick="closeModal('modal-add-account')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
+                        <h2 id="acc-modal-title" class="text-[18px] font-semibold">Add Account</h2>
+                        <button id="acc-save-btn" onclick="saveAccount()" class="w-10 h-10 rounded-full bg-[#232730] text-[#8B93A7] flex items-center justify-center transition-transform"><i class="ph ph-check text-xl"></i></button>
+                    </div>
                 </div>
-                <div class="bg-[#232730] p-1 rounded-full flex mb-8">
+
+                <!-- СКРОЛЛ-КОНТЕНТ -->
+                <div class="flex-1 overflow-y-auto hide-scrollbar px-6 pb-12">
+                <div class="bg-[#232730] p-1 rounded-full flex mb-8 mt-2">
                     <button id="acc-type-asset" onclick="setAccType('asset')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all">Asset</button>
                     <button id="acc-type-debt" onclick="setAccType('debt')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all">Debt</button>
                 </div>
@@ -204,26 +224,34 @@
                     <div id="acc-currency-chips" class="flex justify-center gap-2 flex-wrap"></div>
                 </div>
                 <button id="acc-delete-btn" onclick="deleteAccount()" class="hidden w-full bg-[#FF6B6B]/10 text-[#FF6B6B] font-semibold text-[15px] py-3.5 rounded-[20px] active:scale-95 transition-transform">Delete Account</button>
+                </div>
             </div>
         </div>
 
         <!-- МОДАЛКА СЧЁТА (DETAIL) -->
         <div id="modal-account-detail" class="modal-overlay hidden fixed inset-0 z-50">
             <div class="absolute inset-0 bg-[#0F1115]/60 backdrop-blur-[50px]" onclick="closeModal('modal-account-detail')"></div>
-            <div class="modal-content glass-ui absolute inset-x-0 top-4 bottom-0 rounded-t-[38px] p-6 z-10 pb-12 overflow-y-auto hide-scrollbar">
-                <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
-                <div class="flex justify-between items-center mb-10">
-                    <button onclick="closeModal('modal-account-detail')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
-                    <h2 id="ad-header-name" class="text-[18px] font-semibold"></h2>
-                    <button id="ad-edit-btn" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-pencil-simple text-xl"></i></button>
+            <div class="modal-content glass-ui absolute inset-x-0 top-0 bottom-0 rounded-t-[38px] z-10 flex flex-col overflow-hidden">
+                <!-- ФИКС ШАПКА -->
+                <div class="modal-header shrink-0 px-6 pt-3 pb-4">
+                    <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+                    <div class="flex justify-between items-center">
+                        <button onclick="closeModal('modal-account-detail')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
+                        <h2 id="ad-header-name" class="text-[18px] font-semibold"></h2>
+                        <button id="ad-edit-btn" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-pencil-simple text-xl"></i></button>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center mb-10">
+
+                <!-- СКРОЛЛ-КОНТЕНТ -->
+                <div class="flex-1 overflow-y-auto hide-scrollbar px-6 pb-12">
+                <div class="flex flex-col items-center mb-10 pt-2">
                     <div class="w-[88px] h-[88px] rounded-full flex items-center justify-center mb-4 bg-[linear-gradient(135deg,rgba(76,141,255,0.25),rgba(76,141,255,0.05))]">
                         <i id="ad-icon" class="ph ph-wallet text-[36px] text-[#F5F7FA]"></i>
                     </div>
                     <h3 id="ad-name" class="text-[28px] font-bold"></h3>
                 </div>
                 <div id="ad-balances"></div>
+                </div>
             </div>
         </div>
 
