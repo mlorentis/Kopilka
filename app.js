@@ -963,6 +963,21 @@ function reflowFixedLayout() {
 window.addEventListener('resize', reflowFixedLayout);
 window.addEventListener('focusout', reflowFixedLayout);
 
+// iOS: при открытии клавиатуры WebKit сдвигает visual viewport вниз,
+// чтобы показать фокусное поле, а элементы, привязанные к layout viewport
+// (наша шапка), визуально уезжают наверх за экран — навигация теряется.
+// Компенсируем сдвиг трансформом: шапка следует за visual viewport.
+function syncChromeWithVisualViewport() {
+    if (!window.visualViewport) return;
+    const shift = window.visualViewport.offsetTop;
+    const header = document.getElementById('main-header');
+    if (header) header.style.transform = shift > 0.5 ? `translateY(${shift}px)` : '';
+}
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('scroll', syncChromeWithVisualViewport);
+    window.visualViewport.addEventListener('resize', syncChromeWithVisualViewport);
+}
+
 // Прячем сплеш после первой отрисовки
 window.addEventListener('load', () => {
     const splash = document.getElementById('splash');

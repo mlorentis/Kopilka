@@ -67,11 +67,12 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* ТАББАР — flex-ребёнок внизу колонки. Отступ 25px снизу
-   и по бокам (safe-area снизу учитываем) */
+/* ТАББАР — flex-ребёнок внизу колонки. Бока 25px. Снизу — большее из
+   16px и сейф-зоны: нет зоны → 16 (веб, старые айфоны), есть → чистая
+   сейф-зона (34 на айфонах с подбородком), наш отступ отключается. */
 #tabbar {
     flex: none;
-    padding: 0 25px calc(env(safe-area-inset-bottom, 0px) + 25px);
+    padding: 0 16px max(16px, env(safe-area-inset-bottom, 0px));
     z-index: 40;
     pointer-events: none;
 }
