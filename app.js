@@ -562,7 +562,7 @@ function renderHistory() {
 
 // --- 10. ШАПКА ---
 function renderHeader(tab) {
-    const header = document.getElementById('main-header');
+    const header = document.getElementById('main-header-inner') || document.getElementById('main-header');
     if (!header) return;
 
     const svgIcon = `
@@ -951,6 +951,17 @@ function resetAllData() {
 }
 
 window.onload = init;
+
+// iOS: после закрытия клавиатуры fixed-контейнер может «залипнуть»
+// ужатым — принудительно пересчитываем layout
+function reflowFixedLayout() {
+    const c = document.querySelector('.app-container');
+    if (!c) return;
+    c.style.transform = 'translateZ(0)';
+    requestAnimationFrame(() => { c.style.transform = ''; });
+}
+window.addEventListener('resize', reflowFixedLayout);
+window.addEventListener('focusout', reflowFixedLayout);
 
 // Прячем сплеш после первой отрисовки
 window.addEventListener('load', () => {
