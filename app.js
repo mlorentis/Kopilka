@@ -20,7 +20,7 @@ const ALL_SCREENS = ['home', 'accounts', 'history'];
 // --- ИНИЦИАЛИЗАЦИЯ ---
 function init() {
     updateFabVisibility();
-    applyTabbarBottomInset();
+    fitAppContainer();
     showDebugInfo();
     switchTab('home');
 }
@@ -43,22 +43,29 @@ function getSafeAreaBottom() {
     return v;
 }
 
-// Отступ таббара снизу — два фиксированных значения, без формул.
-// Замер на устройстве: margin 34px → визуал 50px, значит мёртвая зона
-// под webview (PWA iOS) = 16px константа. Визуальные 20 = margin 4.
-// Если на другой трубе визуал другой — меняем ТОЛЬКО число 4 ниже.
-const TABBAR_BOTTOM_PWA = 4;      // +16px мёртвая зона = визуально 20
-const TABBAR_BOTTOM_BROWSER = 20; // браузер: зоны нет, ровно 20
-
-function applyTabbarBottomInset() {
-    const tabbar = document.getElementById('tabbar');
-    if (!tabbar) return;
-    tabbar.style.marginBottom = (window.navigator.standalone === true)
-        ? TABBAR_BOTTOM_PWA + 'px'
-        : TABBAR_BOTTOM_BROWSER + 'px';
+// В iOS standalone PWA layout viewport КОРОЧЕ физического экрана ровно
+// на «мёртвую зону» под webview (область с индикатором Home): innerHeight
+// меньше screen.height на ~34px, и контент заканчивается выше физического
+// низа. Надёжное лечение: растягиваем контейнер приложения на ПОЛНУЮ
+// физическую высоту — тогда таббар с фиксными margin 20px встаёт ровно
+// в 20px от физического низа. В браузере и в ландшафте — не трогаем.
+function fitAppContainer() {
+    const c = document.querySelector('.app-container');
+    if (!c) return;
+    const standalone = window.navigator.standalone === true;
+    const portrait = window.innerHeight >= window.innerWidth;
+    if (standalone && portrait) {
+        // screen.height на iOS не меняется при повороте — это длинная
+        // сторона экрана. Зона = физическая высота − высота viewport.
+        const fullH = Math.max(window.screen.height, window.screen.width);
+        const zone = Math.min(Math.max(0, fullH - window.innerHeight), 44);
+        c.style.height = (window.innerHeight + zone) + 'px';
+    } else {
+        c.style.height = '';
+    }
 }
-window.addEventListener('resize', applyTabbarBottomInset);
-window.addEventListener('orientationchange', applyTabbarBottomInset);
+window.addEventListener('resize', fitAppContainer);
+window.addEventListener('orientationchange', fitAppContainer);
 
 // Диагностика: открыть приложение с #debug в адресе — внизу появится
 // плашка с реальными цифрами экрана. Если отступ «не идеальный» — пришли
