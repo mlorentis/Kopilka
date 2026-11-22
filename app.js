@@ -43,21 +43,19 @@ function getSafeAreaBottom() {
     return v;
 }
 
-// Отступ таббара снизу — margin-bottom. Цель: визуально РОВНО 20px от
-// физического низа экрана везде. Нюанс PWA iOS: под webview остаётся
-// «мёртвая зона» под индикатором Home (область недоступная CSS, ~16px)
-// — webview заканчивается выше физического низа. Зона = screen.height
-// (весь экран) − innerHeight (высота webview). Вычитаем её из 20.
+// Отступ таббара снизу — два фиксированных значения, без формул.
+// Замер на устройстве: margin 34px → визуал 50px, значит мёртвая зона
+// под webview (PWA iOS) = 16px константа. Визуальные 20 = margin 4.
+// Если на другой трубе визуал другой — меняем ТОЛЬКО число 4 ниже.
+const TABBAR_BOTTOM_PWA = 4;      // +16px мёртвая зона = визуально 20
+const TABBAR_BOTTOM_BROWSER = 20; // браузер: зоны нет, ровно 20
+
 function applyTabbarBottomInset() {
     const tabbar = document.getElementById('tabbar');
     if (!tabbar) return;
-    if (window.navigator.standalone !== true) {
-        // Браузер: webview на весь экран — фикс 20px
-        tabbar.style.marginBottom = '20px';
-        return;
-    }
-    const deadZone = Math.max(0, window.screen.height - window.innerHeight);
-    tabbar.style.marginBottom = Math.max(4, 20 - deadZone) + 'px';
+    tabbar.style.marginBottom = (window.navigator.standalone === true)
+        ? TABBAR_BOTTOM_PWA + 'px'
+        : TABBAR_BOTTOM_BROWSER + 'px';
 }
 window.addEventListener('resize', applyTabbarBottomInset);
 window.addEventListener('orientationchange', applyTabbarBottomInset);
