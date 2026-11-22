@@ -2,6 +2,8 @@
 // Kopilka — ядро (сборка с чистого листа, v2)
 // ============================================
 
+const BUILD = 'v9';
+
 // --- ХРАНИЛИЩЕ (модель v2) ---
 let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -43,24 +45,26 @@ function getSafeAreaBottom() {
     return v;
 }
 
-// Контейнер по высоте = ВИЗУАЛЬНЫЙ viewport (то, что WebKit реально
-// рисует). Тогда таббар с margin 20px встаёт ровно в 20px от видимого низа
-// ЛЮБОМ случае: и при полном сливе вью на экран, и при «мёртвой зоне»
-// под webview — vv.height отражает именно видимую область, а не гадание
-// по screen.height. Клавиатура: vv ужимается → таббар сам поднимается
-// над ней (штатное поведение).
+// iOS standalone PWA: layout viewport КОРОЧЕ физического экрана на
+// ~50px (34 safe-area + 16 резерв WebKit под индикатор Home). Canvas при
+// этом рисует весь экран — проверено: завышенный контейнер рендерится
+// целиком, без обрезки. Лечение: в PWA-портрете растягиваем контейнер
+// на ПОЛНУЮ физическую высоту (screen.height — на iOS не меняется при
+// повороте, это длинная сторона). Тогда margin таббара 20px считается от
+// ФИЗИЧЕСКОГО низа: 20px ровно на всех устройствах.
+// Замер на iPhone 13 mini: screenH=812, innerH=762, зона=50.
 function fitAppContainer() {
     const c = document.querySelector('.app-container');
-    if (!c || !window.visualViewport) return;
-    if (window.navigator.standalone === true) {
-        c.style.height = Math.round(window.visualViewport.height) + 'px';
+    if (!c) return;
+    const standalone = window.navigator.standalone === true;
+    const portrait = window.innerHeight >= window.innerWidth;
+    if (standalone && portrait) {
+        c.style.height = Math.max(window.screen.height, window.screen.width) + 'px';
     } else {
         c.style.height = '';
     }
 }
 window.addEventListener('resize', fitAppContainer);
-window.visualViewport?.addEventListener('resize', fitAppContainer);
-window.visualViewport?.addEventListener('scroll', fitAppContainer);
 window.addEventListener('orientationchange', fitAppContainer);
 
 // ДИАГНОСТИКА ВРЕМЕННАЯ: обновляет статическую плашку из index.html.
@@ -72,7 +76,7 @@ function showDebugInfo() {
     const upd = () => {
         const vv = window.visualViewport;
         el.textContent =
-            `BUILD v8 standalone=${window.navigator.standalone} dpr=${window.devicePixelRatio}\n` +
+            `BUILD ${BUILD} standalone=${window.navigator.standalone} dpr=${window.devicePixelRatio}\n` +
             `innerH=${window.innerHeight} screenH=${window.screen.height} vvH=${vv ? Math.round(vv.height) : '-'} vvTop=${vv ? Math.round(vv.offsetTop) : '-'}\n` +
             `safeB=${getSafeAreaBottom()} contH=${document.querySelector('.app-container').style.height || 'auto'}`;
     };
