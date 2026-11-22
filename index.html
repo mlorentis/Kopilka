@@ -14,7 +14,7 @@
     <title>Fintech App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F] flex justify-center items-center min-h-[100dvh]">
@@ -22,14 +22,14 @@
     <div class="app-container flex flex-col">
         
         <!-- ШАПКА -->
-        <header id="main-header" class="shrink-0 relative z-50 px-4 pt-[env(safe-area-inset-top,0px)] pointer-events-none">
-            <!-- Содержимое рендерится через JS. Шапка — flex-ребёнок контейнера,
-                 физически не скроллится: за вьюпорт уехать не может -->
+        <header id="main-header" class="z-50 px-4 pointer-events-none">
+            <!-- Содержимое рендерится через JS. Позиционирование шапки — только
+                 в style.css (фикс к вьюпорту на мобиле), классами не трогаем -->
             <div class="h-[70px] flex justify-between items-start pt-4 max-w-[440px] mx-auto" id="main-header-inner"></div>
         </header>
 
-        <!-- КОНТЕНТ -->
-        <div class="flex-1 min-h-0 overflow-y-auto hide-scrollbar relative [overscroll-behavior:contain]">
+        <!-- КОНТЕНТ — единственная скроллящаяся колонка -->
+        <div id="app-content" class="hide-scrollbar">
             
             <!-- ЭКРАН 1: HOME -->
             <main id="screen-home" class="min-h-full pb-[99px] flex flex-col">
@@ -111,7 +111,7 @@
         </div>
 
         <!-- ПЛАВАЮЩИЙ ТАББАР: высота 64, поля 25 -->
-        <div id="tabbar" class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+25px)] left-[25px] right-[25px] flex justify-between items-end gap-2 z-40 pointer-events-none">
+        <div id="tabbar" class="flex justify-between items-end gap-2 pointer-events-none">
             <div class="glass-ui rounded-full flex items-center p-1.5 flex-1 h-[64px] relative pointer-events-auto">
                 <div id="tab-indicator"></div>
                 <button onclick="switchTab('home')" id="tab-home" class="tab-btn relative flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#4C8DFF] active">
