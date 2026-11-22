@@ -278,11 +278,12 @@ function renderAccounts() {
     });
 }
 
-// --- 7. МОДАЛКА СЧЁТА (DETAIL) ---
+// --- 7. СТРАНИЦА СЧЁТА (DETAIL) ---
 function openAccountDetail(id) {
     const acc = accounts.find(a => a.id === id);
     if (!acc) return;
 
+    openPage('screen-account-detail');
     document.getElementById('ad-header-name').innerText = acc.name;
     document.getElementById('ad-name').innerText = acc.name;
     const iconEl = document.getElementById('ad-icon');
@@ -306,19 +307,14 @@ function openAccountDetail(id) {
         `;
     });
 
-    document.getElementById('ad-edit-btn').onclick = () => {
-        closeModal('modal-account-detail');
-        openEditAccount(id);
-    };
-
-    openModal('modal-account-detail');
+    document.getElementById('ad-edit-btn').onclick = () => openEditAccount(id);
 }
 
 // --- 8. ADD / EDIT ACCOUNT ---
 function openAccountModal() {
     editingAccountId = null;
+    openPage('screen-account-form');
     document.getElementById('acc-modal-title').innerText = 'Add Account';
-    document.getElementById('acc-modal-close').innerHTML = '<i class="ph ph-x text-xl"></i>';
     document.getElementById('acc-name').value = '';
     document.getElementById('acc-type-asset').className = 'flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all';
     document.getElementById('acc-type-debt').className = 'flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all';
@@ -328,8 +324,7 @@ function openAccountModal() {
     renderAccCurrencyChips();
     updateAccSaveBtn();
     document.getElementById('acc-delete-btn').classList.add('hidden');
-    openModal('modal-add-account');
-    setTimeout(() => document.getElementById('acc-name').focus(), 350);
+    setTimeout(() => document.getElementById('acc-name').focus(), 100);
 }
 
 function openEditAccount(id) {
@@ -337,8 +332,8 @@ function openEditAccount(id) {
     if (!acc) return;
     editingAccountId = id;
 
+    openPage('screen-account-form');
     document.getElementById('acc-modal-title').innerText = 'Edit Account';
-    document.getElementById('acc-modal-close').innerHTML = '<i class="ph ph-arrow-left text-xl"></i>';
     document.getElementById('acc-name').value = acc.name;
 
     const isAsset = acc.type === 'asset';
@@ -355,7 +350,6 @@ function openEditAccount(id) {
     renderAccCurrencyChips();
     updateAccSaveBtn();
     document.getElementById('acc-delete-btn').classList.remove('hidden');
-    openModal('modal-add-account');
 }
 
 function setAccType(type) {
@@ -426,8 +420,8 @@ function updateAccSaveBtn() {
     const name = document.getElementById('acc-name').value.trim();
     const ready = name.length > 0;
     btn.className = ready
-        ? 'w-12 h-12 rounded-full bg-[#4C8DFF] text-white flex items-center justify-center active:scale-95 transition-transform'
-        : 'w-12 h-12 rounded-full glass-ui text-[#8B93A7] flex items-center justify-center transition-transform';
+        ? 'w-11 h-11 rounded-full bg-[#4C8DFF] text-white flex items-center justify-center active:scale-95 transition-transform pointer-events-auto'
+        : 'w-11 h-11 rounded-full glass-ui text-[#8B93A7] flex items-center justify-center transition-transform pointer-events-auto';
     return ready;
 }
 
@@ -457,7 +451,6 @@ function saveAccount() {
         });
     }
     saveData();
-    closeModal('modal-add-account');
     init();
     switchTab('accounts');
 }
@@ -471,7 +464,6 @@ function deleteAccount() {
     accounts = accounts.filter(a => a.id !== editingAccountId);
     transactions = transactions.filter(t => t.accountId !== editingAccountId);
     saveData();
-    closeModal('modal-add-account');
     init();
 }
 
@@ -591,12 +583,42 @@ function renderHeader(tab) {
         `;
     } else if (tab === 'profile') {
         header.innerHTML = `
-            <button onclick="closeProfile()" class="w-[44px] h-[44px] rounded-full glass-ui flex items-center justify-center active:scale-95 transition-transform pointer-events-auto">
+            <button onclick="closePage()" class="w-[44px] h-[44px] rounded-full glass-ui flex items-center justify-center active:scale-95 transition-transform pointer-events-auto">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M14.75 19.5L7.25 12L14.75 4.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
                 </svg>
             </button>
             <div class="w-[24px] h-[24px]"></div>
+        `;
+    } else if (tab === 'account-form') {
+        // Add / Edit Account: назад, заголовок по центру кнопок, галка сохранения
+        const chevron = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.75 19.5L7.25 12L14.75 4.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/></svg>`;
+        header.innerHTML = `
+            <button onclick="closePage()" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center active:scale-95 transition-transform pointer-events-auto">${chevron}</button>
+            <h1 id="acc-modal-title" class="h-11 flex items-center text-[18px] font-semibold">Add Account</h1>
+            <button id="acc-save-btn" onclick="saveAccount()" class="w-11 h-11 rounded-full bg-[#232730] text-[#8B93A7] flex items-center justify-center transition-transform pointer-events-auto"><i class="ph ph-check text-xl"></i></button>
+        `;
+    } else if (tab === 'add-tx') {
+        // Транзакция: две шапки для двух шагов, крестик заменён на шеврон
+        const chevron = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.75 19.5L7.25 12L14.75 4.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/></svg>`;
+        header.innerHTML = `
+            <div id="tx-step-1-head" class="flex justify-between items-center flex-1">
+                <button onclick="closePage()" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center active:scale-95 transition-transform pointer-events-auto">${chevron}</button>
+                <h1 class="h-11 flex items-center text-[18px] font-semibold">Select Account</h1>
+                <div class="w-11"></div>
+            </div>
+            <div id="tx-step-2-head" class="hidden flex justify-between items-center flex-1">
+                <button onclick="backToTxStep1()" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center active:scale-95 transition-transform pointer-events-auto">${chevron}</button>
+                <h1 class="h-11 flex items-center text-[18px] font-semibold">Add Transaction</h1>
+                <div class="w-11"></div>
+            </div>
+        `;
+    } else if (tab === 'account-detail') {
+        const chevron = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.75 19.5L7.25 12L14.75 4.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/></svg>`;
+        header.innerHTML = `
+            <button onclick="closePage()" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center active:scale-95 transition-transform pointer-events-auto">${chevron}</button>
+            <h1 id="ad-header-name" class="h-11 flex items-center text-[18px] font-semibold"></h1>
+            <button id="ad-edit-btn" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform pointer-events-auto"><i class="ph ph-pencil-simple text-xl"></i></button>
         `;
     } else if (tab === 'accounts') {
         header.innerHTML = `
@@ -611,13 +633,17 @@ function renderHeader(tab) {
 }
 
 // --- 11. НАВИГАЦИЯ ---
+const ALL_SCREENS = ['home', 'accounts', 'history', 'profile', 'account-form', 'add-tx', 'account-detail'];
+
 function switchTab(tab) {
-    ['home', 'accounts', 'history', 'profile'].forEach(t => {
+    ALL_SCREENS.forEach(t => {
         const screen = document.getElementById(`screen-${t}`);
         const btn = document.getElementById(`tab-${t}`);
         if (screen) screen.classList.add('hidden');
         if (btn) { btn.classList.remove('active', 'text-[#4C8DFF]'); btn.classList.add('text-[#F5F7FA]'); }
     });
+    // Таббар виден только на табах
+    document.getElementById('tabbar')?.classList.remove('hidden');
 
     const activeScreen = document.getElementById(`screen-${tab}`);
     const activeBtn = document.getElementById(`tab-${tab}`);
@@ -740,11 +766,10 @@ function openTxModal() {
     if (accounts.length === 0) { openAccountModal(); return; }
     currentTxType = 'expense';
     setTxType('expense');
+    openPage('screen-add-tx');   // рендерит шапку с шагом 1 (шаг 2 скрыт по умолчанию)
 
     document.getElementById('tx-step-1').classList.remove('hidden');
     document.getElementById('tx-step-2').classList.add('hidden');
-    document.getElementById('tx-step-1-head').classList.remove('hidden');
-    document.getElementById('tx-step-2-head').classList.add('hidden');
 
     const list = document.getElementById('tx-accounts-list');
     list.innerHTML = '';
@@ -759,8 +784,6 @@ function openTxModal() {
             </button>
         `;
     });
-
-    openModal('modal-add-tx');
 }
 
 function selectTxAccount(id) {
@@ -864,35 +887,51 @@ function saveTransaction() {
     amountInput.value = '';
     document.getElementById('tx-note').value = '';
 
-    closeModal('modal-add-tx');
     init();
     switchTab('home');
 }
 
 // --- ПРОФИЛЬ / СБРОС ---
-// Открытие/закрытие — мгновенно, без анимаций
-function openProfile() {
-    const profile = document.getElementById('screen-profile');
-    if (!profile) return;
+// --- НАВИГАЦИЯ СТРАНИЦ ---
+// Отдельные страницы (profile, account-form, add-tx, account-detail):
+// инстант-переход, таббар скрыт, возврат — на вкладку, откуда пришли.
+let returnTab = 'home';
 
-    ['home', 'accounts', 'history'].forEach(t => {
+function currentTab() {
+    return ['home', 'accounts', 'history'].find(t => !document.getElementById(`screen-${t}`).classList.contains('hidden')) || 'home';
+}
+
+function openPage(pageId) {
+    returnTab = currentTab();
+    ['home', 'accounts', 'history', 'profile', 'account-form', 'add-tx', 'account-detail'].forEach(t => {
+        document.getElementById(`screen-${t}`)?.classList.add('hidden');
         const btn = document.getElementById(`tab-${t}`);
         if (btn) { btn.classList.remove('active', 'text-[#4C8DFF]'); btn.classList.add('text-[#F5F7FA]'); }
+    });
+    document.getElementById(pageId).classList.remove('hidden');
+    // Таббар скрыт на всех отдельных страницах
+    document.getElementById('tabbar')?.classList.add('hidden');
+    renderHeader(pageId.replace('screen-', ''));
+    updateTabIndicator(true);
+    const scroller = document.querySelector('.flex-1.overflow-y-auto');
+    if (scroller) scroller.scrollTop = 0;
+}
+
+function closePage() {
+    ['profile', 'account-form', 'add-tx', 'account-detail'].forEach(t => {
         document.getElementById(`screen-${t}`)?.classList.add('hidden');
     });
+    document.getElementById('tabbar')?.classList.remove('hidden');
+    switchTab(returnTab);
+}
 
-    profile.classList.remove('hidden');
-
-    renderHeader('profile');
+function openProfile() {
+    openPage('screen-profile');
     renderProfileStats();
-    updateTabIndicator(true); // инстант: без анимации индикатора
 }
 
 function closeProfile() {
-    const profile = document.getElementById('screen-profile');
-    if (!profile) return;
-    profile.classList.add('hidden');
-    switchTab('home');
+    closePage();
 }
 
 function renderProfileStats() {
@@ -912,7 +951,6 @@ function resetAllData() {
 }
 
 window.onload = init;
-initSwipeOnModals();
 
 // Прячем сплеш после первой отрисовки
 window.addEventListener('load', () => {

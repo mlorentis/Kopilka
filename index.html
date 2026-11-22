@@ -109,7 +109,7 @@
         </div>
 
         <!-- ПЛАВАЮЩИЙ ТАББАР: высота 64, поля 25 -->
-        <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+25px)] left-[25px] right-[25px] flex justify-between items-end gap-2 z-40 pointer-events-none">
+        <div id="tabbar" class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+25px)] left-[25px] right-[25px] flex justify-between items-end gap-2 z-40 pointer-events-none">
             <div class="glass-ui rounded-full flex items-center p-1.5 flex-1 h-[64px] relative pointer-events-auto">
                 <div id="tab-indicator"></div>
                 <button onclick="switchTab('home')" id="tab-home" class="tab-btn relative flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#4C8DFF] active">
@@ -142,118 +142,67 @@
         </div>
 
         <!-- МОДАЛКА ТРАНЗАКЦИИ: 2 ШАГА -->
-        <div id="modal-add-tx" class="modal-overlay hidden fixed inset-0 z-50">
-            <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-add-tx')"></div>
-            <div class="modal-content absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+10px)] bottom-0 rounded-t-[38px] z-10 overflow-y-auto hide-scrollbar bg-[#171A1F]">
-                <!-- ФИКС ШАПКА -->
-                <div class="modal-header sticky top-0 z-20 px-6 pt-3 pb-4">
-                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
-                    <div id="tx-step-1-head" class="flex justify-between items-center">
-                        <button onclick="closeModal('modal-add-tx')" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 class="text-[18px] font-semibold">Select Account</h2>
-                        <div class="w-10"></div>
-                    </div>
-                    <div id="tx-step-2-head" class="hidden flex justify-between items-center">
-                        <button onclick="backToTxStep1()" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-arrow-left text-xl"></i></button>
-                        <h2 class="text-[18px] font-semibold">Add Transaction</h2>
-                        <div class="w-10"></div>
-                    </div>
-                </div>
-
-                <!-- СКРОЛЛ-КОНТЕНТ -->
-                <div class="px-6 pb-12">
-                    <!-- ШАГ 1: выбор счёта -->
-                    <div id="tx-step-1">
-                        <div id="tx-accounts-list"></div>
-                    </div>
-
-                    <!-- ШАГ 2: валюта + сумма + тип + заметка -->
-                    <div id="tx-step-2" class="hidden">
-                        <p class="text-center text-[#8B93A7] text-[14px] mb-6 pt-2">to <span id="tx-selected-account" class="text-[#F5F7FA] font-medium"></span></p>
-                    <div class="flex justify-center gap-2 mb-8" id="tx-currency-chips"></div>
-                    <div class="bg-[#232730] p-1 rounded-full flex mb-8">
-                        <button id="btn-expense" onclick="setTxType('expense')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm">Expense</button>
-                        <button id="btn-income" onclick="setTxType('income')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium">Income</button>
-                    </div>
-                    <div class="text-center mb-8">
-                        <div class="flex items-center justify-center">
-                            <input type="text" inputmode="decimal" id="tx-amount" placeholder="0" class="bg-transparent text-[64px] font-bold text-center w-auto outline-none placeholder:text-[#8B93A7] leading-none">
-                            <span id="tx-amount-symbol" class="text-[#8B93A7] text-[24px] font-semibold ml-2 mt-3"></span>
-                        </div>
-                    </div>
-                    <div class="mb-8">
-                        <label class="text-[14px] text-[#8B93A7] mb-2 block font-medium">Note</label>
-                        <input type="text" id="tx-note" placeholder="Coffee..." class="w-full bg-[#232730] border border-white/5 rounded-[16px] p-4 text-white outline-none placeholder:text-[#8B93A7] text-[16px]">
-                    </div>
-                    <button onclick="saveTransaction()" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px] active:scale-95 transition-transform">Confirm</button>
-                    </div>
-                </div>
+                <!-- ЭКРАН: ADD TRANSACTION -->
+        <main id="screen-add-tx" class="hidden min-h-full flex flex-col px-4 pb-[99px] pt-6">
+            <!-- ШАГ 1: выбор счёта -->
+            <div id="tx-step-1">
+                <div id="tx-accounts-list"></div>
             </div>
-        </div>
+
+            <!-- ШАГ 2: валюта + сумма + тип + заметка -->
+            <div id="tx-step-2" class="hidden">
+                <p class="text-center text-[#8B93A7] text-[14px] mb-6 pt-2">to <span id="tx-selected-account" class="text-[#F5F7FA] font-medium"></span></p>
+                <div class="flex justify-center gap-2 mb-8" id="tx-currency-chips"></div>
+                <div class="bg-[#232730] p-1 rounded-full flex mb-8">
+                    <button id="btn-expense" onclick="setTxType('expense')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm">Expense</button>
+                    <button id="btn-income" onclick="setTxType('income')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium">Income</button>
+                </div>
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center">
+                        <input type="text" inputmode="decimal" id="tx-amount" placeholder="0" class="bg-transparent text-[64px] font-bold text-center w-auto outline-none placeholder:text-[#8B93A7] leading-none">
+                        <span id="tx-amount-symbol" class="text-[#8B93A7] text-[24px] font-semibold ml-2 mt-3"></span>
+                    </div>
+                </div>
+                <div class="mb-8">
+                    <label class="text-[14px] text-[#8B93A7] mb-2 block font-medium">Note</label>
+                    <input type="text" id="tx-note" placeholder="Coffee..." class="w-full bg-[#232730] border border-white/5 rounded-[16px] p-4 text-white outline-none placeholder:text-[#8B93A7] text-[16px]">
+                </div>
+                <button onclick="saveTransaction()" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px] active:scale-95 transition-transform">Confirm</button>
+            </div>
+        </main>
 
         <!-- МОДАЛКА ADD / EDIT ACCOUNT -->
-        <div id="modal-add-account" class="modal-overlay hidden fixed inset-0 z-50">
-            <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-add-account')"></div>
-            <div class="modal-content absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+10px)] bottom-0 rounded-t-[38px] z-10 overflow-y-auto hide-scrollbar bg-[#171A1F]">
-                <!-- ФИКС ШАПКА -->
-                <div class="modal-header sticky top-0 z-20 px-6 pt-3 pb-4">
-                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
-                    <div class="flex justify-between items-center">
-                        <button id="acc-modal-close" onclick="closeModal('modal-add-account')" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 id="acc-modal-title" class="text-[18px] font-semibold">Add Account</h2>
-                        <button id="acc-save-btn" onclick="saveAccount()" class="w-10 h-10 rounded-full bg-[#232730] text-[#8B93A7] flex items-center justify-center transition-transform"><i class="ph ph-check text-xl"></i></button>
-                    </div>
-                </div>
-
-                <!-- СКРОЛЛ-КОНТЕНТ -->
-                <div class="px-6 pb-12">
-                <div class="bg-[#232730] p-1 rounded-full flex mb-8 mt-2">
-                    <button id="acc-type-asset" onclick="setAccType('asset')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all">Asset</button>
-                    <button id="acc-type-debt" onclick="setAccType('debt')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all">Debt</button>
-                </div>
-                <div class="mb-8">
-                    <input type="text" id="acc-name" oninput="updateAccSaveBtn()" placeholder="Name" class="w-full bg-transparent text-center text-[36px] font-semibold text-white outline-none placeholder:text-[#8B93A7] leading-tight">
-                </div>
-                <div class="mb-8">
-                    <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center">Icon</label>
-                    <div id="acc-icon-picker" class="flex justify-center gap-3"></div>
-                </div>
-                <div class="mb-10">
-                    <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center">Currencies</label>
-                    <div id="acc-currency-chips" class="flex justify-center gap-2 flex-wrap"></div>
-                </div>
-                <button id="acc-delete-btn" onclick="deleteAccount()" class="hidden w-full bg-[#FF6B6B]/10 text-[#FF6B6B] font-semibold text-[15px] py-3.5 rounded-[20px] active:scale-95 transition-transform">Delete Account</button>
-                </div>
+                <!-- ЭКРАН: ADD / EDIT ACCOUNT -->
+        <main id="screen-account-form" class="hidden min-h-full flex flex-col px-4 pb-[99px] pt-6">
+            <div class="bg-[#232730] p-1 rounded-full flex mb-8">
+                <button id="acc-type-asset" onclick="setAccType('asset')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all">Asset</button>
+                <button id="acc-type-debt" onclick="setAccType('debt')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all">Debt</button>
             </div>
-        </div>
-
-        <!-- МОДАЛКА СЧЁТА (DETAIL) -->
-        <div id="modal-account-detail" class="modal-overlay hidden fixed inset-0 z-50">
-            <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-account-detail')"></div>
-            <div class="modal-content absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+10px)] bottom-0 rounded-t-[38px] z-10 overflow-y-auto hide-scrollbar bg-[#171A1F]">
-                <!-- ФИКС ШАПКА -->
-                <div class="modal-header sticky top-0 z-20 px-6 pt-3 pb-4">
-                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
-                    <div class="flex justify-between items-center">
-                        <button onclick="closeModal('modal-account-detail')" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 id="ad-header-name" class="text-[18px] font-semibold"></h2>
-                        <button id="ad-edit-btn" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-pencil-simple text-xl"></i></button>
-                    </div>
-                </div>
-
-                <!-- СКРОЛЛ-КОНТЕНТ -->
-                <div class="px-6 pb-12">
-                <div class="flex flex-col items-center mb-10 pt-4 px-4">
-                    <div class="w-[64px] h-[64px] rounded-full flex items-center justify-center mb-4 bg-[linear-gradient(135deg,rgba(76,141,255,0.25),rgba(76,141,255,0.05))]">
-                        <span id="ad-icon" class="flex items-center justify-center"></span>
-                    </div>
-                    <h3 id="ad-name" class="text-[32px] font-bold text-center leading-[38px] break-words"></h3>
-                </div>
-                <div id="ad-balances"></div>
-                </div>
+            <div class="mb-8">
+                <input type="text" id="acc-name" oninput="updateAccSaveBtn()" placeholder="Name" class="w-full bg-transparent text-center text-[36px] font-semibold text-white outline-none placeholder:text-[#8B93A7] leading-tight">
             </div>
-        </div>
+            <div class="mb-8">
+                <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center">Icon</label>
+                <div id="acc-icon-picker" class="flex justify-center gap-3"></div>
+            </div>
+            <div class="mb-10">
+                <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center">Currencies</label>
+                <div id="acc-currency-chips" class="flex justify-center gap-2 flex-wrap"></div>
+            </div>
+            <button id="acc-delete-btn" onclick="deleteAccount()" class="hidden w-full bg-[#FF6B6B]/10 text-[#FF6B6B] font-semibold text-[15px] py-3.5 rounded-[20px] active:scale-95 transition-transform">Delete Account</button>
+        </main>
 
+
+        <!-- ЭКРАН: ACCOUNT DETAIL -->
+        <main id="screen-account-detail" class="hidden min-h-full flex flex-col px-4 pb-[99px] pt-6">
+            <div class="flex flex-col items-center mb-10 px-4">
+                <div class="w-[64px] h-[64px] rounded-full flex items-center justify-center mb-4 bg-[linear-gradient(135deg,rgba(76,141,255,0.25),rgba(76,141,255,0.05))]">
+                    <span id="ad-icon" class="flex items-center justify-center"></span>
+                </div>
+                <h3 id="ad-name" class="text-[32px] font-bold text-center leading-[38px] break-words"></h3>
+            </div>
+            <div id="ad-balances"></div>
+        </main>
     <!-- Общий градиент стекла для заливки SVG-иконок (фил .glass-ui) -->
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
         <defs>
