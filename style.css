@@ -223,7 +223,9 @@ button {
     opacity: 1;
 }
 
-/* Лист: от safe-area+10px до самого низа, скругление 38 сверху */
+/* Лист: flex-колонка. Сам лист НЕ скроллится (overflow:hidden) —
+   скроллится только .modal-body. Структура bulletproof для iOS:
+   без sticky, который глючит в WebKit. */
 .modal-sheet {
     position: absolute;
     left: 0;
@@ -232,9 +234,9 @@ button {
     bottom: 0;
     background-color: #171A1F;
     border-radius: 38px 38px 0 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     transform: translateY(100%);
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
     will-change: transform;
@@ -244,16 +246,30 @@ button {
     transform: translateY(0);
 }
 
-/* Шапка листа: sticky — едет вместе с листом, прилипает при скролле,
-   контент скроллится под неё и проступает сквозь блюр */
+/* Шапка листа: обычный flex-ребёнок, физически стоит наверху,
+   контент за неё не залезает */
 .modal-header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
+    flex-shrink: 0;
     padding: 12px 24px 16px;
     background-color: rgba(23, 26, 31, 0.2);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+}
+
+/* Тело листа — ЕДИНСТВЕННЫЙ скроллящийся элемент.
+   overflow-x: hidden обязателен: когда одна ось overflow:auto,
+   вторая по спеке вычисляется как auto — появляется гориз. скролл */
+.modal-body {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal-body::-webkit-scrollbar {
+    display: none;
 }
 
 /* =========================================

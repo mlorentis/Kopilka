@@ -29,7 +29,7 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=16">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F] flex justify-center items-center min-h-[100dvh]">
 
@@ -152,7 +152,7 @@
                         <button type="button" id="acc-save-btn" onclick="saveAccount()" class="w-11 h-11 rounded-full glass-ui text-[#8B93A7] flex items-center justify-center transition-transform"><i class="ph ph-check text-xl"></i></button>
                     </div>
                 </div>
-                <div class="px-6 pt-[106px] pb-12">
+                <div class="modal-body px-6 pb-12">
                     <div class="bg-[#232730] p-1 rounded-full flex mb-8">
                         <button type="button" id="acc-type-asset" onclick="setAccType('asset')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all">Asset</button>
                         <button type="button" id="acc-type-debt" onclick="setAccType('debt')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all">Debt</button>
@@ -190,7 +190,7 @@
                         <div class="w-11"></div>
                     </div>
                 </div>
-                <div class="px-6 pt-[106px] pb-12">
+                <div class="modal-body px-6 pb-12">
                     <div id="tx-step-1"><div id="tx-accounts-list"></div></div>
                     <div id="tx-step-2" class="hidden">
                         <p class="text-center text-[#8B93A7] text-[14px] mb-6 pt-2">to <span id="tx-selected-account" class="text-[#F5F7FA] font-medium"></span></p>
@@ -227,7 +227,7 @@
                         <button type="button" id="ad-edit-btn" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-pencil-simple text-xl"></i></button>
                     </div>
                 </div>
-                <div class="px-6 pt-[106px] pb-12">
+                <div class="modal-body px-6 pb-12">
                     <div class="flex flex-col items-center mb-10 px-4">
                         <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-[linear-gradient(135deg,rgba(76,141,255,0.25),rgba(76,141,255,0.05))]">
                             <span id="ad-icon" class="flex items-center justify-center"></span>
@@ -251,7 +251,7 @@
                         <div class="w-11"></div>
                     </div>
                 </div>
-                <div class="px-6 pt-[106px] pb-12">
+                <div class="modal-body px-6 pb-12">
                     <div class="glass-ui rounded-[32px] p-6 mb-6">
                         <p class="text-[15px] text-[#8B93A7] mb-1">Accounts: <span id="profile-acc-count" class="text-[#F5F7FA] font-medium"></span></p>
                         <p class="text-[15px] text-[#8B93A7] mb-6">Transactions: <span id="profile-tx-count" class="text-[#F5F7FA] font-medium"></span></p>
@@ -283,6 +283,6 @@
 
     </div>
 
-    <script src="app.js?v=13"></script>
+    <script src="app.js?v=16"></script>
 </body>
 </html>

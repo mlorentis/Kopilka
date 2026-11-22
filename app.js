@@ -74,6 +74,13 @@ function getAccountTotal(acc) {
     return Object.values(acc.balances).reduce((sum, b) => sum + b, 0);
 }
 
+// Переключение видимости через inline-стиль. Надёжнее классов hidden/flex:
+// у Tailwind CDN порядок генерации утилит нестабилен, и статический
+// flex на элементе может победить hidden (блок остаётся виден).
+function setBlock(el, show, display) {
+    if (el) el.style.display = show ? display : 'none';
+}
+
 // --- ИНИЦИАЛИЗАЦИЯ ---
 function init() {
     updateFabVisibility();
@@ -85,8 +92,7 @@ function init() {
 
 // FAB виден только при наличии счетов
 function updateFabVisibility() {
-    const fab = document.getElementById('fab-add-tx');
-    if (fab) fab.classList.toggle('hidden', accounts.length === 0);
+    setBlock(document.getElementById('fab-add-tx'), accounts.length > 0, 'flex');
 }
 
 // --- РЕНДЕР ГЛАВНОЙ ---
@@ -122,26 +128,19 @@ function renderHome() {
     const blockNetWorth = document.getElementById('block-networth');
     const blockAssets = document.getElementById('block-assets');
     const blockDebts = document.getElementById('block-debts');
+    const hasAccounts = accounts.length > 0;
 
-    if (accounts.length === 0) {
-        blockEmpty.classList.remove('hidden');
-        blockNetWorth.classList.add('hidden');
-        blockAssets.classList.add('hidden');
-        blockDebts.classList.add('hidden');
-        return;
-    }
-    blockEmpty.classList.add('hidden');
-    blockNetWorth.classList.remove('hidden');
-    blockNetWorth.classList.add('flex');
+    setBlock(blockEmpty, !hasAccounts, 'flex');
+    setBlock(blockNetWorth, hasAccounts, 'flex');
+    setBlock(blockAssets, false, 'block');
+    setBlock(blockDebts, false, 'block');
+    if (!hasAccounts) return;
 
     renderHomeSection('asset', blockAssets, 'assets-total', 'home-assets-list');
     renderHomeSection('debt', blockDebts, 'debts-total', 'home-debts-list');
 
     const debtsList = document.getElementById('home-debts-list');
-    if (debtsList) {
-        debtsList.classList.toggle('hidden', debtsCollapsed);
-        debtsList.classList.toggle('flex', !debtsCollapsed);
-    }
+    if (debtsList) setBlock(debtsList, !debtsCollapsed, 'flex');
     const chevron = document.getElementById('debts-chevron');
     if (chevron) chevron.className = `ph ${debtsCollapsed ? 'ph-caret-down' : 'ph-caret-up'} text-[16px] text-[#8B93A7]`;
 }
@@ -164,10 +163,10 @@ function renderHomeSection(type, block, totalId, listId) {
     const total = sectionAccounts.reduce((s, a) => s + getAccountTotal(a), 0);
 
     if (sectionAccounts.length === 0) {
-        block.classList.add('hidden');
+        setBlock(block, false, 'block');
         return;
     }
-    block.classList.remove('hidden');
+    setBlock(block, true, 'block');
     const totalSign = isDebt ? (total !== 0 ? '−' : '') : (total < 0 ? '−' : '');
     if (totalEl) totalEl.innerText = `${totalSign}${formatMoney(total)} $`;
 
@@ -218,7 +217,7 @@ function renderAccounts() {
     list.innerHTML = '';
 
     const segment = document.getElementById('acc-segment');
-    if (segment) segment.classList.toggle('hidden', accounts.length === 0);
+    setBlock(segment, accounts.length > 0, 'flex');
 
     if (accounts.length === 0) {
         list.innerHTML = emptyStateHTML('Add your first account', 'Track cash, cards, or crypto in one place', 'Add Account', 'openAccountModal()');
@@ -442,17 +441,19 @@ function closeModal(id) {
     setTimeout(() => modal.classList.add('hidden'), 400);
 }
 
-// Свайп вниз для закрытия (срабатывает только на верхушке скролла)
+// Свайп вниз для закрытия (срабатывает только на верхушке скролла).
+// Скроллится .modal-body, лист двигаем целиком трансформом.
 function attachSwipeToClose(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) return;
     const sheet = modal.querySelector('.modal-sheet');
-    if (!sheet) return;
+    const body = modal.querySelector('.modal-body');
+    if (!sheet || !body) return;
 
     let startY = 0, dy = 0, dragging = false;
 
     sheet.addEventListener('touchstart', e => {
-        if (sheet.scrollTop > 0) return; // контент скроллится — свайп не начинаем
+        if (body.scrollTop > 0) return; // контент скроллится — свайп не начинаем
         startY = e.touches[0].clientY;
         dy = 0;
         dragging = true;
