@@ -37,11 +37,12 @@ body {
    ЛЕЙАУТ (Резиновый под мобилки и Десктоп)
    ========================================= */
 .app-container {
-    width: 100%;
-    height: 100vh; 
-    height: 100dvh;
+    /* fixed вместо 100dvh: на iOS контейнер не должен пересчитываться
+       при открытии клавиатуры и скролле body */
+    position: fixed;
+    inset: 0;
+    margin: auto;
     background-color: transparent;
-    position: relative;
 }
 
 @media (min-width: 1280px) {
@@ -50,7 +51,6 @@ body {
     body { background-color: #0F1115 !important; }
 
     .app-container {
-        position: relative;
         width: 375px;
         height: 812px;
         max-height: 100dvh;
@@ -100,11 +100,12 @@ body {
 .modal-overlay.active { opacity: 1; }
 .modal-overlay.active .modal-content { transform: translateY(0); }
 
-/* Фиксированная шапка модалки: контент скроллится под неё */
+/* Фиксированная шапка модалки: контент скроллится под неё,
+   сквозь лёгкий фрост проступает уехавший вверх контент */
 .modal-header {
-    background-color: rgba(23, 26, 31, 0.7);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    background-color: rgba(23, 26, 31, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 /* =========================================

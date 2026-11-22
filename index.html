@@ -14,12 +14,12 @@
     <title>Fintech App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F] flex justify-center items-center min-h-[100dvh]">
 
-    <div class="app-container relative flex flex-col">
+    <div class="app-container flex flex-col">
         
         <!-- ШАПКА -->
         <header id="main-header" class="absolute top-[env(safe-area-inset-top,0px)] left-0 right-0 h-[70px] px-4 flex justify-between pt-4 z-50 pointer-events-none">
@@ -27,7 +27,7 @@
         </header>
 
         <!-- КОНТЕНТ -->
-        <div class="flex-1 overflow-y-auto hide-scrollbar relative pt-[70px]">
+        <div class="flex-1 overflow-y-auto hide-scrollbar relative pt-[calc(env(safe-area-inset-top,0px)+70px)]">
             
             <!-- ЭКРАН 1: HOME -->
             <main id="screen-home" class="min-h-full pb-[99px] flex flex-col">
@@ -36,8 +36,7 @@
                 <div id="block-networth" class="hidden flex flex-col items-center mb-[24px] py-[32px] px-4">
                     <p class="text-[#8B93A7] text-[16px] font-semibold leading-[19px] mb-2">Net Worth</p>
                     <div class="flex items-center justify-center mb-2">
-                        <h1 id="net-worth-amount" class="text-[#F5F7FA] text-[48px] font-bold leading-[58px] tracking-tight">0,00</h1>
-                        <span class="text-[#8B93A7] text-[36px] font-bold leading-[44px] ml-2 mt-1">$</span>
+                        <h1 id="net-worth-amount" class="text-[#F5F7FA] text-[48px] font-bold leading-[58px] tracking-tight">0,00<span class="text-[#8B93A7] text-[36px] leading-[44px]"> $</span></h1>
                     </div>
                     <p class="text-[16px] font-medium leading-[19px] hidden">
                         <span class="text-[#2ECC71]" id="net-worth-delta">+0,00 $</span>
@@ -85,21 +84,21 @@
             </main>
 
             <!-- ЭКРАН 2: ACCOUNTS -->
-            <main id="screen-accounts" class="px-4 pb-[99px] pt-[96px] hidden">
-                <div class="glass-ui p-1 rounded-full flex mb-8">
+            <main id="screen-accounts" class="min-h-full flex flex-col px-4 pb-[99px] hidden">
+                <div id="acc-segment" class="glass-ui p-1 rounded-full flex mb-8">
                     <button id="acc-tab-assets" onclick="setAccountTab('asset')" class="flex-1 py-2.5 rounded-full bg-[#232730] text-white text-[15px] font-medium shadow-sm">Assets</button>
                     <button id="acc-tab-debts" onclick="setAccountTab('debt')" class="flex-1 py-2.5 rounded-full text-[#8B93A7] text-[15px] font-medium">Debts</button>
                 </div>
-                <div id="accounts-list" class="flex flex-col"></div>
+                <div id="accounts-list" class="flex-1 flex flex-col"></div>
             </main>
 
             <!-- ЭКРАН 3: HISTORY -->
-            <main id="screen-history" class="px-4 pb-[99px] pt-[96px] hidden">
-                <div id="history-list"></div>
+            <main id="screen-history" class="min-h-full flex flex-col px-4 pb-[99px] hidden">
+                <div id="history-list" class="flex-1 flex flex-col"></div>
             </main>
 
             <!-- ЭКРАН 4: PROFILE -->
-            <main id="screen-profile" class="px-4 pb-[99px] pt-[96px] hidden">
+            <main id="screen-profile" class="min-h-full flex flex-col px-4 pb-[99px] hidden">
                 <div class="glass-ui rounded-[32px] p-6">
                     <p class="text-[15px] text-[#8B93A7] mb-1">Accounts: <span id="profile-acc-count" class="text-[#F5F7FA] font-medium">0</span></p>
                     <p class="text-[15px] text-[#8B93A7] mb-6">Transactions: <span id="profile-tx-count" class="text-[#F5F7FA] font-medium">0</span></p>
@@ -110,7 +109,7 @@
         </div>
 
         <!-- ПЛАВАЮЩИЙ ТАББАР: высота 64, поля 25 -->
-        <div class="absolute bottom-[25px] left-[25px] right-[25px] flex justify-between items-end gap-2 z-40 pointer-events-none">
+        <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+25px)] left-[25px] right-[25px] flex justify-between items-end gap-2 z-40 pointer-events-none">
             <div class="glass-ui rounded-full flex items-center p-1.5 flex-1 h-[64px] relative pointer-events-auto">
                 <div id="tab-indicator"></div>
                 <button onclick="switchTab('home')" id="tab-home" class="tab-btn relative flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#4C8DFF] active">
@@ -144,25 +143,25 @@
 
         <!-- МОДАЛКА ТРАНЗАКЦИИ: 2 ШАГА -->
         <div id="modal-add-tx" class="modal-overlay hidden fixed inset-0 z-50">
-            <div class="absolute inset-0 bg-[#0F1115]/60 backdrop-blur-[50px]" onclick="closeModal('modal-add-tx')"></div>
-            <div class="modal-content glass-ui absolute inset-x-0 top-4 bottom-0 rounded-t-[38px] z-10 flex flex-col overflow-hidden">
+            <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-add-tx')"></div>
+            <div class="modal-content absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+10px)] bottom-0 rounded-t-[38px] z-10 overflow-y-auto hide-scrollbar bg-[#171A1F]">
                 <!-- ФИКС ШАПКА -->
-                <div class="modal-header shrink-0 px-6 pt-3 pb-4">
-                    <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+                <div class="modal-header sticky top-0 z-20 px-6 pt-3 pb-4">
+                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
                     <div id="tx-step-1-head" class="flex justify-between items-center">
-                        <button onclick="closeModal('modal-add-tx')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
+                        <button onclick="closeModal('modal-add-tx')" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
                         <h2 class="text-[18px] font-semibold">Select Account</h2>
                         <div class="w-10"></div>
                     </div>
                     <div id="tx-step-2-head" class="hidden flex justify-between items-center">
-                        <button onclick="backToTxStep1()" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-arrow-left text-xl"></i></button>
+                        <button onclick="backToTxStep1()" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-arrow-left text-xl"></i></button>
                         <h2 class="text-[18px] font-semibold">Add Transaction</h2>
                         <div class="w-10"></div>
                     </div>
                 </div>
 
                 <!-- СКРОЛЛ-КОНТЕНТ -->
-                <div class="flex-1 overflow-y-auto hide-scrollbar px-6 pb-12">
+                <div class="px-6 pb-12">
                     <!-- ШАГ 1: выбор счёта -->
                     <div id="tx-step-1">
                         <div id="tx-accounts-list"></div>
@@ -194,20 +193,20 @@
 
         <!-- МОДАЛКА ADD / EDIT ACCOUNT -->
         <div id="modal-add-account" class="modal-overlay hidden fixed inset-0 z-50">
-            <div class="absolute inset-0 bg-[#0F1115]/60 backdrop-blur-[50px]" onclick="closeModal('modal-add-account')"></div>
-            <div class="modal-content glass-ui absolute inset-x-0 top-4 bottom-0 rounded-t-[38px] z-10 flex flex-col overflow-hidden">
+            <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-add-account')"></div>
+            <div class="modal-content absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+10px)] bottom-0 rounded-t-[38px] z-10 overflow-y-auto hide-scrollbar bg-[#171A1F]">
                 <!-- ФИКС ШАПКА -->
-                <div class="modal-header shrink-0 px-6 pt-3 pb-4">
-                    <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+                <div class="modal-header sticky top-0 z-20 px-6 pt-3 pb-4">
+                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
                     <div class="flex justify-between items-center">
-                        <button id="acc-modal-close" onclick="closeModal('modal-add-account')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
+                        <button id="acc-modal-close" onclick="closeModal('modal-add-account')" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
                         <h2 id="acc-modal-title" class="text-[18px] font-semibold">Add Account</h2>
                         <button id="acc-save-btn" onclick="saveAccount()" class="w-10 h-10 rounded-full bg-[#232730] text-[#8B93A7] flex items-center justify-center transition-transform"><i class="ph ph-check text-xl"></i></button>
                     </div>
                 </div>
 
                 <!-- СКРОЛЛ-КОНТЕНТ -->
-                <div class="flex-1 overflow-y-auto hide-scrollbar px-6 pb-12">
+                <div class="px-6 pb-12">
                 <div class="bg-[#232730] p-1 rounded-full flex mb-8 mt-2">
                     <button id="acc-type-asset" onclick="setAccType('asset')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all">Asset</button>
                     <button id="acc-type-debt" onclick="setAccType('debt')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all">Debt</button>
@@ -230,30 +229,40 @@
 
         <!-- МОДАЛКА СЧЁТА (DETAIL) -->
         <div id="modal-account-detail" class="modal-overlay hidden fixed inset-0 z-50">
-            <div class="absolute inset-0 bg-[#0F1115]/60 backdrop-blur-[50px]" onclick="closeModal('modal-account-detail')"></div>
-            <div class="modal-content glass-ui absolute inset-x-0 top-4 bottom-0 rounded-t-[38px] z-10 flex flex-col overflow-hidden">
+            <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-account-detail')"></div>
+            <div class="modal-content absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+10px)] bottom-0 rounded-t-[38px] z-10 overflow-y-auto hide-scrollbar bg-[#171A1F]">
                 <!-- ФИКС ШАПКА -->
-                <div class="modal-header shrink-0 px-6 pt-3 pb-4">
-                    <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+                <div class="modal-header sticky top-0 z-20 px-6 pt-3 pb-4">
+                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
                     <div class="flex justify-between items-center">
-                        <button onclick="closeModal('modal-account-detail')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
+                        <button onclick="closeModal('modal-account-detail')" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
                         <h2 id="ad-header-name" class="text-[18px] font-semibold"></h2>
-                        <button id="ad-edit-btn" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-pencil-simple text-xl"></i></button>
+                        <button id="ad-edit-btn" class="w-12 h-12 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-pencil-simple text-xl"></i></button>
                     </div>
                 </div>
 
                 <!-- СКРОЛЛ-КОНТЕНТ -->
-                <div class="flex-1 overflow-y-auto hide-scrollbar px-6 pb-12">
-                <div class="flex flex-col items-center mb-10 pt-2">
-                    <div class="w-[88px] h-[88px] rounded-full flex items-center justify-center mb-4 bg-[linear-gradient(135deg,rgba(76,141,255,0.25),rgba(76,141,255,0.05))]">
-                        <i id="ad-icon" class="ph ph-wallet text-[36px] text-[#F5F7FA]"></i>
+                <div class="px-6 pb-12">
+                <div class="flex flex-col items-center mb-10 pt-4 px-4">
+                    <div class="w-[64px] h-[64px] rounded-full flex items-center justify-center mb-4 bg-[linear-gradient(135deg,rgba(76,141,255,0.25),rgba(76,141,255,0.05))]">
+                        <span id="ad-icon" class="flex items-center justify-center"></span>
                     </div>
-                    <h3 id="ad-name" class="text-[28px] font-bold"></h3>
+                    <h3 id="ad-name" class="text-[32px] font-bold text-center leading-[38px] break-words"></h3>
                 </div>
                 <div id="ad-balances"></div>
                 </div>
             </div>
         </div>
+
+    <!-- Общий градиент стекла для заливки SVG-иконок (фил .glass-ui) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <linearGradient id="kopilkaGlass" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+                <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+            </linearGradient>
+        </defs>
+    </svg>
 
     <!-- СПЛЕШ-СКРИН: прикрывает первую отрисовку. Внутри контейнера —
          на десктопе прикрывает только остров со скруглением -->
@@ -267,6 +276,6 @@
 
     </div>
 
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=8"></script>
 </body>
 </html>
