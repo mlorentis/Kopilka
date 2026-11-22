@@ -20,6 +20,7 @@ const ALL_SCREENS = ['home', 'accounts', 'history'];
 // --- ИНИЦИАЛИЗАЦИЯ ---
 function init() {
     updateFabVisibility();
+    applyTabbarBottomInset();
     switchTab('home');
 }
 
@@ -28,6 +29,21 @@ function updateFabVisibility() {
     const fab = document.getElementById('fab-add-tx');
     if (fab) fab.classList.toggle('hidden', accounts.length === 0);
 }
+
+// iOS standalone PWA НЕ растягивает веб-вью под home indicator (даже с
+// viewport-fit=cover): под layout viewport остаётся «мёртвая зона» ~34px,
+// недоступная для CSS. В Safari вью на весь экран — там всё чисто.
+// Поэтому: в PWA (navigator.standalone) нижний отступ таббара убираем —
+// пилюля прижимается к низу layout viewport, индикатор остаётся ниже
+// в мёртвой зоне. В браузере — обычные 20px.
+function applyTabbarBottomInset() {
+    const tabbar = document.getElementById('tabbar');
+    if (!tabbar) return;
+    const iosStandalone = window.navigator.standalone === true;
+    tabbar.style.paddingBottom = iosStandalone ? '0px' : '20px';
+}
+window.addEventListener('resize', applyTabbarBottomInset);
+window.addEventListener('orientationchange', applyTabbarBottomInset);
 
 // --- ШАПКА ---
 function renderHeader(tab) {
