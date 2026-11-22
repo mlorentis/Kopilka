@@ -20,7 +20,6 @@ const ALL_SCREENS = ['home', 'accounts', 'history'];
 // --- ИНИЦИАЛИЗАЦИЯ ---
 function init() {
     updateFabVisibility();
-    applyTabbarBottomInset();
     showDebugInfo();
     switchTab('home');
 }
@@ -33,7 +32,7 @@ function updateFabVisibility() {
 
 // Реальная нижняя сейф-зона устройства: читаем через probe-элемент
 // (env() в JS напрямую не прочитать). На айфонах с home indicator ≈34px,
-// на SE/в браузере — 0.
+// на SE/в браузере — 0. Используется только в диагностике.
 function getSafeAreaBottom() {
     const probe = document.createElement('div');
     probe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;padding-bottom:env(safe-area-inset-bottom,0px);';
@@ -43,21 +42,10 @@ function getSafeAreaBottom() {
     return v;
 }
 
-// Отступ таббара снизу — через margin-bottom (не padding!).
-// PWA (navigator.standalone): отступ = max(20, сейф-зона) — на айфоне
-// с индикатором это ~34px, пилюля висит над мёртвой зоной, как нативные
-// приложения. Браузер: ровно 20px.
-function applyTabbarBottomInset() {
-    const tabbar = document.getElementById('tabbar');
-    if (!tabbar) return;
-    if (window.navigator.standalone === true) {
-        tabbar.style.marginBottom = Math.max(20, getSafeAreaBottom()) + 'px';
-    } else {
-        tabbar.style.marginBottom = '20px';
-    }
-}
-window.addEventListener('resize', applyTabbarBottomInset);
-window.addEventListener('orientationchange', applyTabbarBottomInset);
+// Отступ таббара снизу — ФИКСИРОВАННЫЙ margin-bottom 20px (в style.css).
+// В PWA iOS под webview есть «мёртвая зона» ~16px под индикатором Home,
+// поэтому на айфоне визуально выходит ~36px (≈34), в браузере — ровно 20.
+// Отдельно safe-area НЕ добавляем: 20 + 16 ≈ 34 само собой.
 
 // Диагностика: открыть приложение с #debug в адресе — внизу появится
 // плашка с реальными цифрами экрана. Если отступ «не идеальный» — пришли
