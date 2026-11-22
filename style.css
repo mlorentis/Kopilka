@@ -50,12 +50,23 @@ body {
     background-color: transparent;
 }
 
-/* ШАПКА — flex-ребёнок, safe-area сверху внутри неё */
+/* ШАПКА — flex-ребёнок, safe-area сверху внутри неё.
+   will-change: transform — отдельный композитный слой, на iOS это
+   убирает тряску при скролле (слой не перерисовывается с контентом). */
 #main-header {
     flex: none;
     padding-top: env(safe-area-inset-top, 0px);
     z-index: 50;
     pointer-events: none;
+    will-change: transform;
+}
+
+/* Подложка шапки на отдельных страницах: контент скроллится под неё,
+   без подложки он сливался бы с кнопками. Класс вешает openPage. */
+#main-header.page-bg {
+    background-color: rgba(23, 26, 31, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 /* СКРОЛЛ-КОНТЕНТ — единственная скроллящаяся колонка */
@@ -72,7 +83,7 @@ body {
    сейф-зона (34 на айфонах с подбородком), наш отступ отключается. */
 #tabbar {
     flex: none;
-    padding: 0 16px max(16px, env(safe-area-inset-bottom, 0px));
+    padding: 0 16px max(20px, env(safe-area-inset-bottom, 0px));
     z-index: 40;
     pointer-events: none;
 }

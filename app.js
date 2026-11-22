@@ -909,8 +909,9 @@ function openPage(pageId) {
         if (btn) { btn.classList.remove('active', 'text-[#4C8DFF]'); btn.classList.add('text-[#F5F7FA]'); }
     });
     document.getElementById(pageId).classList.remove('hidden');
-    // Таббар скрыт на всех отдельных страницах
+    // Таббар скрыт на всех отдельных страницах, шапка получает подложку
     document.getElementById('tabbar')?.classList.add('hidden');
+    document.getElementById('main-header')?.classList.add('page-bg');
     renderHeader(pageId.replace('screen-', ''));
     updateTabIndicator(true);
     const scroller = document.getElementById('app-content');
@@ -922,6 +923,7 @@ function closePage() {
         document.getElementById(`screen-${t}`)?.classList.add('hidden');
     });
     document.getElementById('tabbar')?.classList.remove('hidden');
+    document.getElementById('main-header')?.classList.remove('page-bg');
     switchTab(returnTab);
 }
 
@@ -966,16 +968,28 @@ window.addEventListener('focusout', reflowFixedLayout);
 // iOS: при открытии клавиатуры WebKit сдвигает visual viewport вниз,
 // чтобы показать фокусное поле, а элементы, привязанные к layout viewport
 // (наша шапка), визуально уезжают наверх за экран — навигация теряется.
-// Компенсируем сдвиг трансформом: шапка следует за visual viewport.
+// Компенсируем сдвиг трансформом. ВАЖНО: только пока клавиатура реально
+// открыта (фокус в поле ввода) — иначе при обычном скролле visualViewport
+// шлёт микрособытия и шапка дёргается.
+let vvRafPending = false;
 function syncChromeWithVisualViewport() {
-    if (!window.visualViewport) return;
-    const shift = window.visualViewport.offsetTop;
-    const header = document.getElementById('main-header');
-    if (header) header.style.transform = shift > 0.5 ? `translateY(${shift}px)` : '';
+    if (!window.visualViewport || vvRafPending) return;
+    vvRafPending = true;
+    requestAnimationFrame(() => {
+        vvRafPending = false;
+        const header = document.getElementById('main-header');
+        if (!header) return;
+        const active = document.activeElement;
+        const typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
+        const shift = typing ? Math.round(window.visualViewport.offsetTop) : 0;
+        header.style.transform = shift > 1 ? `translateY(${shift}px)` : '';
+    });
 }
 if (window.visualViewport) {
     window.visualViewport.addEventListener('scroll', syncChromeWithVisualViewport);
     window.visualViewport.addEventListener('resize', syncChromeWithVisualViewport);
+    document.addEventListener('focusin', syncChromeWithVisualViewport);
+    document.addEventListener('focusout', syncChromeWithVisualViewport);
 }
 
 // Прячем сплеш после первой отрисовки
