@@ -43,47 +43,40 @@ function getSafeAreaBottom() {
     return v;
 }
 
-// В iOS standalone PWA layout viewport КОРОЧЕ физического экрана ровно
-// на «мёртвую зону» под webview (область с индикатором Home): innerHeight
-// меньше screen.height на ~34px, и контент заканчивается выше физического
-// низа. Надёжное лечение: растягиваем контейнер приложения на ПОЛНУЮ
-// физическую высоту — тогда таббар с фиксными margin 20px встаёт ровно
-// в 20px от физического низа. В браузере и в ландшафте — не трогаем.
+// Контейнер по высоте = ВИЗУАЛЬНЫЙ viewport (то, что WebKit реально
+// рисует). Тогда таббар с margin 20px встаёт ровно в 20px от видимого низа
+// ЛЮБОМ случае: и при полном сливе вью на экран, и при «мёртвой зоне»
+// под webview — vv.height отражает именно видимую область, а не гадание
+// по screen.height. Клавиатура: vv ужимается → таббар сам поднимается
+// над ней (штатное поведение).
 function fitAppContainer() {
     const c = document.querySelector('.app-container');
-    if (!c) return;
-    const standalone = window.navigator.standalone === true;
-    const portrait = window.innerHeight >= window.innerWidth;
-    if (standalone && portrait) {
-        // screen.height на iOS не меняется при повороте — это длинная
-        // сторона экрана. Зона = физическая высота − высота viewport.
-        const fullH = Math.max(window.screen.height, window.screen.width);
-        const zone = Math.min(Math.max(0, fullH - window.innerHeight), 44);
-        c.style.height = (window.innerHeight + zone) + 'px';
+    if (!c || !window.visualViewport) return;
+    if (window.navigator.standalone === true) {
+        c.style.height = Math.round(window.visualViewport.height) + 'px';
     } else {
         c.style.height = '';
     }
 }
 window.addEventListener('resize', fitAppContainer);
+window.visualViewport?.addEventListener('resize', fitAppContainer);
+window.visualViewport?.addEventListener('scroll', fitAppContainer);
 window.addEventListener('orientationchange', fitAppContainer);
 
-// Диагностика: открыть приложение с #debug в адресе — внизу появится
-// плашка с реальными цифрами экрана. Если отступ «не идеальный» — пришли
-// скрин с ней, по цифрам сразу видно, что происходит.
+// ДИАГНОСТИКА ВРЕМЕННАЯ: плашка видна ВСЕГДА, пока не решим отступ.
+// Пришли скрин с ней из PWA — по цифрам вижу реальную геометрию экрана.
 function showDebugInfo() {
-    if (!location.hash.includes('debug')) return;
     const el = document.createElement('div');
-    el.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:999;background:#000;color:#0f0;font:11px/1.5 monospace;padding:6px 8px;border-radius:6px;white-space:pre;';
+    el.style.cssText = 'position:fixed;left:4px;top:4px;z-index:9999;background:rgba(0,0,0,.75);color:#0f0;font:10px/1.5 monospace;padding:4px 6px;border-radius:4px;pointer-events:none;white-space:pre;';
     const upd = () => {
+        const vv = window.visualViewport;
         el.textContent =
-            `standalone=${window.navigator.standalone}\n` +
-            `innerH=${window.innerHeight} screenH=${window.screen.height}\n` +
-            `vvH=${window.visualViewport ? Math.round(window.visualViewport.height) : '-'}\n` +
-            `safeB=${getSafeAreaBottom()} tabbarMB=${getComputedStyle(document.getElementById('tabbar')).marginBottom}\n` +
-            `deadZone=${Math.max(0, window.screen.height - window.innerHeight)}`;
+            `v7 standalone=${window.navigator.standalone} dpr=${window.devicePixelRatio}\n` +
+            `innerH=${window.innerHeight} screenH=${window.screen.height} vvH=${vv ? Math.round(vv.height) : '-'} vvTop=${vv ? Math.round(vv.offsetTop) : '-'}\n` +
+            `safeB=${getSafeAreaBottom()} contH=${document.querySelector('.app-container').style.height || 'auto'}`;
     };
     upd();
-    setInterval(upd, 500);
+    setInterval(upd, 400);
     document.body.appendChild(el);
 }
 
