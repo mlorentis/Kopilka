@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <!-- iOS PWA: статус-бар прозрачный, контент уходит под него -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- apple-mobile-web-app-capable УБРАН: в честном standalone iOS
+         отрезает нижние 50px под индикатор Home от webview. Standalone
+         теперь определяется manifest.json (iOS 16.4+). Как в первой сборке. -->
     <meta name="theme-color" content="#171A1F">
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -29,7 +28,7 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=18">
+    <link rel="stylesheet" href="style.css?v=20">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F] flex justify-center items-center min-h-[100dvh]">
 
@@ -283,6 +282,6 @@
 
     </div>
 
-    <script src="app.js?v=18"></script>
+    <script src="app.js?v=20"></script>
 </body>
 </html>
