@@ -913,7 +913,7 @@ function openPage(pageId) {
     document.getElementById('tabbar')?.classList.add('hidden');
     renderHeader(pageId.replace('screen-', ''));
     updateTabIndicator(true);
-    const scroller = document.querySelector('.flex-1.overflow-y-auto');
+    const scroller = document.getElementById('app-content');
     if (scroller) scroller.scrollTop = 0;
 }
 

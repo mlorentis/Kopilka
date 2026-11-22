@@ -34,34 +34,31 @@ body {
 }
 
 /* =========================================
-   ЛЕЙАУТ (Резиновый под мобилки и Десктоп)
+   ЛЕЙАУТ — канонический app-shell, собран с чистого листа.
+   Контейнер = фиксированная колонка на весь вьюпорт:
+   ШАПКА / СКРОЛЛ-КОНТЕНТ / ТАББАР.
+   Шапка и таббар — обычные flex-children БЕЗ position/absolute/
+   fixed/transform: им физически нечем скроллиться, они в потоке
+   колонки фиксированной высоты. Скроллится только #app-content.
    ========================================= */
 .app-container {
-    /* fixed вместо 100dvh: на iOS контейнер не должен пересчитываться
-       при открытии клавиатуры и скролле body */
     position: fixed;
     inset: 0;
     margin: auto;
-    background-color: transparent;
     display: flex;
     flex-direction: column;
+    background-color: transparent;
 }
 
-/* =========================================
-   ШАПКА — фиксированный хедер, НИКОГДА не скроллится.
-   Позиционируется только здесь, не через классы в разметке.
-   ========================================= */
+/* ШАПКА — flex-ребёнок, safe-area сверху внутри неё */
 #main-header {
     flex: none;
-    position: absolute;
-    top: env(safe-area-inset-top, 0px);
-    left: 0;
-    right: 0;
+    padding-top: env(safe-area-inset-top, 0px);
     z-index: 50;
     pointer-events: none;
 }
 
-/* Единственная скроллящаяся колонка */
+/* СКРОЛЛ-КОНТЕНТ — единственная скроллящаяся колонка */
 #app-content {
     flex: 1 1 0;
     min-height: 0;
@@ -70,53 +67,14 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* =========================================
-   ТАББАР — фиксирован, НИКОГДА не скроллится
-   ========================================= */
+/* ТАББАР — flex-ребёнок внизу колонки. Отступ 25px снизу
+   и по бокам (safe-area снизу учитываем) */
 #tabbar {
-    position: absolute;
-    left: 25px;
-    right: 25px;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 25px);
+    flex: none;
+    padding: 0 25px calc(env(safe-area-inset-bottom, 0px) + 25px);
     z-index: 40;
     pointer-events: none;
 }
-
-@media (max-width: 1279px) {
-    /* Мобайл: шапка прибита к вьюпорту.
-       ТАББАР — через top:100% + translateY: iOS-костыль против бага WebKit,
-       когда fixed-элемент с якорем bottom после клавиатуры/жестов
-       «застревает» посередине экрана. Здесь нижний край не участвует
-       в позиционировании — таббар висит за низом вьюпорта трансформом. */
-    #main-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding-top: env(safe-area-inset-top, 0px);
-    }
-    #tabbar {
-        position: fixed;
-        top: 100%;
-        bottom: auto;
-        left: 25px;
-        right: 25px;
-        transform: translateY(calc(-100% - 25px - env(safe-area-inset-bottom, 0px)));
-    }
-    /* Отступ контента под фикс-шапку */
-    #app-content {
-        padding-top: calc(env(safe-area-inset-top, 0px) + 70px);
-    }
-}
-
-/* =========================================
-   iOS-ФИКС: шапка и таббар прибиты к вьюпорту напрямую.
-   После закрытия клавиатуры WebKit иногда оставляет
-   fixed-контейнер ужатым — absolute-дети тогда уезжали
-   вверх. Fixed-элементы смотрят на вьюпорт и не зависят
-   от высоты контейнера. На десктопе (остров) остаются
-   absolute внутри контейнера.
-   ========================================= */
 
 @media (min-width: 1280px) {
     /* Подложка за островом — на несколько тонов темнее приложения.
