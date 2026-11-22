@@ -20,6 +20,7 @@ const ALL_SCREENS = ['home', 'accounts', 'history'];
 // --- ИНИЦИАЛИЗАЦИЯ ---
 function init() {
     updateFabVisibility();
+    applyTabbarBottomInset();
     showDebugInfo();
     switchTab('home');
 }
@@ -42,10 +43,24 @@ function getSafeAreaBottom() {
     return v;
 }
 
-// Отступ таббара снизу — ФИКСИРОВАННЫЙ margin-bottom 20px (в style.css).
-// В PWA iOS под webview есть «мёртвая зона» ~16px под индикатором Home,
-// поэтому на айфоне визуально выходит ~36px (≈34), в браузере — ровно 20.
-// Отдельно safe-area НЕ добавляем: 20 + 16 ≈ 34 само собой.
+// Отступ таббара снизу — margin-bottom. Цель: визуально РОВНО 20px от
+// физического низа экрана везде. Нюанс PWA iOS: под webview остаётся
+// «мёртвая зона» под индикатором Home (область недоступная CSS, ~16px)
+// — webview заканчивается выше физического низа. Зона = screen.height
+// (весь экран) − innerHeight (высота webview). Вычитаем её из 20.
+function applyTabbarBottomInset() {
+    const tabbar = document.getElementById('tabbar');
+    if (!tabbar) return;
+    if (window.navigator.standalone !== true) {
+        // Браузер: webview на весь экран — фикс 20px
+        tabbar.style.marginBottom = '20px';
+        return;
+    }
+    const deadZone = Math.max(0, window.screen.height - window.innerHeight);
+    tabbar.style.marginBottom = Math.max(4, 20 - deadZone) + 'px';
+}
+window.addEventListener('resize', applyTabbarBottomInset);
+window.addEventListener('orientationchange', applyTabbarBottomInset);
 
 // Диагностика: открыть приложение с #debug в адресе — внизу появится
 // плашка с реальными цифрами экрана. Если отступ «не идеальный» — пришли
@@ -59,7 +74,8 @@ function showDebugInfo() {
             `standalone=${window.navigator.standalone}\n` +
             `innerH=${window.innerHeight} screenH=${window.screen.height}\n` +
             `vvH=${window.visualViewport ? Math.round(window.visualViewport.height) : '-'}\n` +
-            `safeB=${getSafeAreaBottom()} tabbarMB=${getComputedStyle(document.getElementById('tabbar')).marginBottom}`;
+            `safeB=${getSafeAreaBottom()} tabbarMB=${getComputedStyle(document.getElementById('tabbar')).marginBottom}\n` +
+            `deadZone=${Math.max(0, window.screen.height - window.innerHeight)}`;
     };
     upd();
     setInterval(upd, 500);
