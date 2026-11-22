@@ -788,14 +788,61 @@ function resetAllData() {
     init();
 }
 
+// --- ВРЕМЕННАЯ ДИАГНОСТИКА (убрать после решения) ---
+// Показывает реальную геометрию экрана 8 секунд — пришли скрин первого
+// запуска. По этим цифрам я вычислю точную формулу под твоё устройство.
+function showGeometryProbe() {
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;left:4px;top:calc(env(safe-area-inset-top,0px)+80px);z-index:9999;background:rgba(0,0,0,.85);color:#0f0;font:12px/1.6 monospace;padding:6px 8px;border-radius:6px;pointer-events:none;white-space:pre;';
+    const upd = () => {
+        const c = document.querySelector('.app-container');
+        const tb = document.getElementById('tabbar');
+        const el100 = document.createElement('div');
+        el100.style.cssText = 'position:absolute;height:100dvh;width:0;visibility:hidden;pointer-events:none;';
+        document.body.appendChild(el100);
+        const dvhH = el100.getBoundingClientRect().height;
+        el100.remove();
+        el.textContent =
+            `innerH=${window.innerHeight} screenH=${window.screen.height}\n` +
+            `dvh=${Math.round(dvhH)} contH=${Math.round(c.getBoundingClientRect().height)}\n` +
+            `tabbarGap=${Math.round(window.screen.height - tb.getBoundingClientRect().bottom)}`;
+    };
+    upd();
+    document.body.appendChild(el);
+    setTimeout(() => { el.style.transition = 'opacity .5s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 500); }, 8000);
+}
+
 // --- СТАРТ ---
 // Пустой touchstart-листенер: в iOS без него :active не срабатывает,
 // поэтому active:scale-95 (сжатие кнопок) работало только на десктопе
 document.addEventListener('touchstart', () => {}, { passive: true });
 
-window.onload = init;
+// iOS + клавиатура: при фокусе в поле система сдвигает visual viewport,
+// чтобы показать инпут — страница «прыгает», модалка ломается, после
+// закрытия клавиатуры сдвиг иногда не возвращается (таббар «выше нужного»).
+// Лечение: показываем поле самими ДО того, как система начнёт паниковать.
+// 1) сразу при focusin (мгновенно, пока клавиатура ещё не открылась);
+// 2) повторно после анимации клавиатуры (~350мс) для страховки.
+function revealFocusedInput(el) {
+    const body = el.closest('.modal-body');
+    const scroller = body || document.getElementById('app-content');
+    if (!scroller) return;
+    const target = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
+    scroller.scrollTo({ top: target - scroller.clientHeight / 2 + el.offsetHeight / 2 });
+}
 
-// Свайп-закрытие на всех модалках
+document.addEventListener('focusin', e => {
+    if (!e.target.matches('input, textarea')) return;
+    revealFocusedInput(e.target);
+    setTimeout(() => revealFocusedInput(e.target), 350);
+});
+
+// При закрытии клавиатуры сбрасываем сдвиг вьюпорта — форсируем возврат
+document.addEventListener('focusout', () => {
+    setTimeout(() => window.scrollTo(0, 0), 100);
+});
+
+window.onload = () => { init(); showGeometryProbe(); };
 ['modal-account', 'modal-add-tx', 'modal-account-detail', 'modal-profile'].forEach(attachSwipeToClose);
 
 // Прячем сплеш после первой отрисовки
