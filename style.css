@@ -80,14 +80,18 @@ button {
     padding-bottom: 24px;
 }
 
-/* ТАББАР — flex-ребёнок внизу. Фикс: 20px снизу, 20px по бокам */
+/* ТАББАР — flex-ребёнок внизу. Нижний отступ — НЕ padding, а
+   margin-bottom (задаётся в JS, applyTabbarBottomInset): в PWA iOS под
+   webview остаётся «мёртвая зона» под home indicator, отступ снаружи
+   управляется точнее. По бокам — 20px. */
 #tabbar {
     flex: none;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     gap: 8px;
-    padding: 0 20px 20px;
+    margin-bottom: 20px;
+    padding: 0 20px;
     z-index: 40;
     pointer-events: none;
 }

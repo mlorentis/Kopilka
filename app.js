@@ -21,6 +21,7 @@ const ALL_SCREENS = ['home', 'accounts', 'history'];
 function init() {
     updateFabVisibility();
     applyTabbarBottomInset();
+    showDebugInfo();
     switchTab('home');
 }
 
@@ -30,20 +31,52 @@ function updateFabVisibility() {
     if (fab) fab.classList.toggle('hidden', accounts.length === 0);
 }
 
-// iOS standalone PWA НЕ растягивает веб-вью под home indicator (даже с
-// viewport-fit=cover): под layout viewport остаётся «мёртвая зона» ~34px,
-// недоступная для CSS. В Safari вью на весь экран — там всё чисто.
-// Поэтому: в PWA (navigator.standalone) нижний отступ таббара убираем —
-// пилюля прижимается к низу layout viewport, индикатор остаётся ниже
-// в мёртвой зоне. В браузере — обычные 20px.
+// Реальная нижняя сейф-зона устройства: читаем через probe-элемент
+// (env() в JS напрямую не прочитать). На айфонах с home indicator ≈34px,
+// на SE/в браузере — 0.
+function getSafeAreaBottom() {
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;padding-bottom:env(safe-area-inset-bottom,0px);';
+    document.body.appendChild(probe);
+    const v = parseFloat(getComputedStyle(probe).paddingBottom) || 0;
+    probe.remove();
+    return v;
+}
+
+// Отступ таббара снизу — через margin-bottom (не padding!).
+// PWA (navigator.standalone): отступ = max(20, сейф-зона) — на айфоне
+// с индикатором это ~34px, пилюля висит над мёртвой зоной, как нативные
+// приложения. Браузер: ровно 20px.
 function applyTabbarBottomInset() {
     const tabbar = document.getElementById('tabbar');
     if (!tabbar) return;
-    const iosStandalone = window.navigator.standalone === true;
-    tabbar.style.paddingBottom = iosStandalone ? '0px' : '20px';
+    if (window.navigator.standalone === true) {
+        tabbar.style.marginBottom = Math.max(20, getSafeAreaBottom()) + 'px';
+    } else {
+        tabbar.style.marginBottom = '20px';
+    }
 }
 window.addEventListener('resize', applyTabbarBottomInset);
 window.addEventListener('orientationchange', applyTabbarBottomInset);
+
+// Диагностика: открыть приложение с #debug в адресе — внизу появится
+// плашка с реальными цифрами экрана. Если отступ «не идеальный» — пришли
+// скрин с ней, по цифрам сразу видно, что происходит.
+function showDebugInfo() {
+    if (!location.hash.includes('debug')) return;
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:999;background:#000;color:#0f0;font:11px/1.5 monospace;padding:6px 8px;border-radius:6px;white-space:pre;';
+    const upd = () => {
+        el.textContent =
+            `standalone=${window.navigator.standalone}\n` +
+            `innerH=${window.innerHeight} screenH=${window.screen.height}\n` +
+            `vvH=${window.visualViewport ? Math.round(window.visualViewport.height) : '-'}\n` +
+            `safeB=${getSafeAreaBottom()} tabbarMB=${getComputedStyle(document.getElementById('tabbar')).marginBottom}`;
+    };
+    upd();
+    setInterval(upd, 500);
+    document.body.appendChild(el);
+}
 
 // --- ШАПКА ---
 function renderHeader(tab) {
