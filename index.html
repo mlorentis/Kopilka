@@ -1,160 +1,136 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Fintech App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-</head>
-<body class="text-[#F5F7FA] font-sans antialiased bg-[#0F1115] flex justify-center items-center min-h-[100dvh]">
+    <!-- iOS PWA: статус-бар прозрачный, контент уходит под него -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#171A1F">
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <title>Kopilka</title>
 
-    <div class="app-container relative flex flex-col bg-transparent">
-        
-        <!-- ШАПКА -->
-        <header id="main-header" class="absolute top-[env(safe-area-inset-top,0px)] left-0 right-0 h-[54px] px-4 flex justify-between items-end pb-[10px] z-50 pointer-events-none">
-            <!-- Содержимое рендерится через JS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+    <link rel="stylesheet" href="style.css?v=11">
+</head>
+<body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F] flex justify-center items-center min-h-[100dvh]">
+
+    <!-- ДИАГНОСТИКА: статическая плашка прямо в HTML — видна даже если JS
+         закэширован старый. Версия BUILD видна сразу. JS обновляет цифры. -->
+    <div id="debug-panel">BUILD v11-static (JS не подхватился)</div>
+
+    <div class="app-container">
+
+        <!-- ШАПКА: flex-ребёнок, физически не скроллится. Контент — JS -->
+        <header id="main-header">
+            <div id="main-header-inner"></div>
         </header>
 
-        <!-- КОНТЕНТ -->
-        <div class="flex-1 overflow-y-auto hide-scrollbar relative pt-[74px]">
-            
-            <!-- ЭКРАН 1: HOME -->
-            <main id="screen-home" class="pb-32 flex flex-col">
-                
-                <!-- БЛОК NET WORTH -->
-                <div class="flex flex-col items-center mb-[24px] py-[32px] px-4">
-                    <p class="text-[#8B93A7] text-[16px] font-semibold leading-[19px] mb-2">Net Worth</p>
-                    <div class="flex items-center justify-center mb-2">
-                        <h1 id="net-worth-amount" class="text-[#F5F7FA] text-[48px] font-bold leading-[58px] tracking-tight">0,00</h1>
-                        <span class="text-[#8B93A7] text-[36px] font-bold leading-[44px] ml-2 mt-1">$</span>
-                    </div>
-                    <p class="text-[16px] font-medium leading-[19px]">
-                        <span class="text-[#FF6B6B]" id="net-worth-delta">−12,09 $</span> 
-                        <span class="text-[#8B93A7] ml-1">24h</span>
-                    </p>
-                </div>
+        <!-- КОНТЕНТ: единственный скроллящийся блок -->
+        <div id="app-content">
 
-                <!-- БЛОК ASSETS (Скролл с отступами) -->
-                <div id="block-assets" class="mb-4 hidden">
-                    <h2 class="text-[20px] font-semibold leading-[24px] text-[#F5F7FA] mb-4 px-4">Assets</h2>
-                    <!-- px-4 внутри скролла, чтобы скругления не обрезались, и -mx-4, чтобы компенсировать внешние отступы -->
-                    <div class="flex gap-[10px] overflow-x-auto hide-scrollbar pb-2 px-4 -mx-0" id="home-assets-list"></div>
-                </div>
-
-                <!-- OWED TO ME -->
-                <div id="block-owed" class="mb-[40px] hidden px-4">
-                    <div class="glass-ui rounded-[32px] p-5 flex flex-col h-[143px] justify-between w-full">
-                        <div class="flex items-center gap-3">
-                            <div class="w-[44px] h-[44px] rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]">
-                                <i class="ph ph-clock text-lg"></i>
-                            </div>
-                            <span class="font-medium text-[16px]">Owed to me</span>
-                        </div>
-                        <p class="text-[32px] font-bold leading-none" id="total-owed">0,00 <span class="text-[#8B93A7] text-[18px]">$</span></p>
-                    </div>
-                </div>
-
-                <!-- DEBTS -->
-                <div id="block-debts" class="mb-8 hidden px-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-[20px] font-semibold leading-[24px]">Debts <i class="ph ph-caret-up text-[16px] text-[#8B93A7]"></i></h2>
-                        <span class="text-[#8B93A7] text-[15px] font-medium" id="total-debts">−0,00 $</span>
-                    </div>
-                    <div id="home-debts-list" class="flex flex-col gap-[10px]"></div>
-                </div>
-            </main>
-
-            <!-- ЭКРАН 2: ACCOUNTS -->
-            <main id="screen-accounts" class="px-4 pb-32 hidden">
-                <div class="glass-ui p-1 rounded-full flex mb-8">
-                    <button class="flex-1 py-2.5 rounded-full bg-[#232730] text-white text-[15px] font-medium shadow-sm">Assets</button>
-                    <button class="flex-1 py-2.5 rounded-full text-[#8B93A7] text-[15px] font-medium">Debts</button>
-                </div>
-
-                <div class="flex gap-3 overflow-x-auto hide-scrollbar mb-8">
-                    <button class="px-5 py-2.5 rounded-full bg-[#4C8DFF] text-white text-[15px] font-medium flex items-center gap-2 whitespace-nowrap shadow-[0_4px_12px_rgba(76,141,255,0.3)]">
-                        <i class="ph ph-wallet"></i> Cash
-                    </button>
-                    <button class="px-5 py-2.5 rounded-full glass-ui text-[#8B93A7] text-[15px] font-medium flex items-center gap-2 whitespace-nowrap">
-                        <i class="ph ph-credit-card"></i> Bank Accounts
+            <!-- ЭКРАН: HOME -->
+            <main id="screen-home" class="screen">
+                <div id="block-empty">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40.3341 20.1117V23.8884C40.3341 24.8967 39.5274 25.7217 38.5007 25.7584H34.9074C32.9274 25.7584 31.1124 24.31 30.9474 22.33C30.8374 21.175 31.2774 20.0934 32.0474 19.3417C32.7257 18.645 33.6607 18.2417 34.6874 18.2417H38.5007C39.5274 18.2784 40.3341 19.1034 40.3341 20.1117Z" fill="#F5F7FA"/>
+                        <path d="M37.5287 28.5082H34.907C31.4237 28.5082 28.4903 25.8865 28.197 22.5498C28.032 20.6432 28.7287 18.7365 30.122 17.3798C31.2953 16.1698 32.927 15.4915 34.687 15.4915H37.5287C38.0603 15.4915 38.5003 15.0515 38.4453 14.5198C38.042 10.0648 35.0903 7.0215 30.7087 6.50817C30.2687 6.43484 29.8103 6.4165 29.3337 6.4165H12.8337C12.3203 6.4165 11.8253 6.45317 11.3487 6.5265C6.67366 7.11317 3.66699 10.5965 3.66699 15.5832V28.4165C3.66699 33.4765 7.77366 37.5832 12.8337 37.5832H29.3337C34.467 37.5832 38.0053 34.3748 38.4453 29.4798C38.5003 28.9482 38.0603 28.5082 37.5287 28.5082ZM23.8337 17.8748H12.8337C12.082 17.8748 11.4587 17.2515 11.4587 16.4998C11.4587 15.7482 12.082 15.1248 12.8337 15.1248H23.8337C24.5853 15.1248 25.2087 15.7482 25.2087 16.4998C25.2087 17.2515 24.5853 17.8748 23.8337 17.8748Z" fill="#F5F7FA"/>
+                    </svg>
+                    <div class="h-4"></div>
+                    <h2 class="text-[22px] font-semibold">Add your first account</h2>
+                    <div class="h-2"></div>
+                    <p class="text-[#8B93A7] text-[14px] leading-[17px] font-normal">Track cash, cards, or crypto in one place</p>
+                    <div class="h-6"></div>
+                    <button type="button" class="glass-ui text-white font-semibold text-[15px] h-[44px] px-6 rounded-full flex items-center gap-2 active:scale-95 transition-transform">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2.42871V13.5716" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
+                            <path d="M2.42871 8H13.5716" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
+                        </svg>
+                        Add Account
                     </button>
                 </div>
-
-                <div id="accounts-list" class="flex flex-col gap-4"></div>
             </main>
 
-            <!-- ЭКРАН 3: HISTORY -->
-            <main id="screen-history" class="px-4 pb-32 hidden">
-                <div id="history-list"></div>
-            </main>
+            <!-- ЭКРАН: ACCOUNTS -->
+            <main id="screen-accounts" class="screen hidden"></main>
+
+            <!-- ЭКРАН: HISTORY -->
+            <main id="screen-history" class="screen hidden"></main>
+
         </div>
 
-        <!-- ПЛАВАЮЩИЙ ТАББАР -->
-        <div class="absolute bottom-6 left-0 right-0 px-4 flex justify-between items-end z-40 pointer-events-none">
-            <div class="glass-ui rounded-full flex items-center p-1.5 flex-1 mr-4 h-[68px] relative pointer-events-auto">
-                <button onclick="switchTab('home')" id="tab-home" class="tab-btn flex-1 flex flex-col items-center justify-center h-full rounded-full transition-all text-[#4C8DFF] active">
-                    <i class="ph-fill ph-house text-[22px] mb-0.5"></i>
-                    <span class="text-[10px] font-semibold">Home</span>
+        <!-- ТАББАР: flex-ребёнок внизу колонки. 20px снизу, 20px по бокам -->
+        <nav id="tabbar">
+            <div id="tab-pill" class="glass-ui rounded-full flex items-center p-1.5 h-[64px] flex-1 relative">
+                <div id="tab-indicator"></div>
+                <button type="button" onclick="switchTab('home')" id="tab-home" class="tab-btn relative flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#4C8DFF] active">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23.3806 7.95663L16.6606 3.25497C14.8289 1.97163 12.0173 2.04163 10.2556 3.40663L4.4106 7.9683C3.24393 8.8783 2.32227 10.745 2.32227 12.215V20.265C2.32227 23.24 4.73727 25.6666 7.71227 25.6666H20.2889C23.2639 25.6666 25.6789 23.2516 25.6789 20.2766V12.3666C25.6789 10.7916 24.6639 8.85497 23.3806 7.95663ZM14.8756 21C14.8756 21.4783 14.4789 21.875 14.0006 21.875C13.5223 21.875 13.1256 21.4783 13.1256 21V17.5C13.1256 17.0216 13.5223 16.625 14.0006 16.625C14.4789 16.625 14.8756 17.0216 14.8756 17.5V21Z" fill="currentColor"/>
+                    </svg>
+                    <span class="text-[10px] font-semibold leading-[12px]">Home</span>
                 </button>
-                <button onclick="switchTab('accounts')" id="tab-accounts" class="tab-btn flex-1 flex flex-col items-center justify-center h-full rounded-full transition-all text-[#8B93A7]">
-                    <i class="ph ph-credit-card text-[22px] mb-0.5"></i>
-                    <span class="text-[10px] font-semibold">Accounts</span>
+                <button type="button" onclick="switchTab('accounts')" id="tab-accounts" class="tab-btn relative -ml-2 flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#F5F7FA]">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25.6666 14.7232V17.1265C25.6666 17.7799 25.1299 18.3165 24.4649 18.3165H22.2133C20.9533 18.3165 19.7983 17.3949 19.6933 16.1349C19.6233 15.3999 19.9033 14.7115 20.3933 14.2332C20.8249 13.7899 21.4199 13.5332 22.0733 13.5332H24.4649C25.1299 13.5332 25.6666 14.0699 25.6666 14.7232Z" fill="currentColor"/>
+                        <path d="M17.943 16.2865C17.838 15.0615 18.2813 13.8598 19.168 12.9848C19.9147 12.2265 20.953 11.7831 22.073 11.7831H22.738C23.0647 11.7831 23.333 11.5148 23.2863 11.1881C22.9713 8.9248 21.0113 7.1748 18.6663 7.1748H6.99967C4.42134 7.1748 2.33301 9.26314 2.33301 11.8415V20.0081C2.33301 22.5865 4.42134 24.6748 6.99967 24.6748H18.6663C21.023 24.6748 22.9713 22.9248 23.2863 20.6615C23.333 20.3348 23.0647 20.0665 22.738 20.0665H22.213C19.9963 20.0665 18.1297 18.4098 17.943 16.2865ZM15.1663 13.8831H8.16634C7.68801 13.8831 7.29134 13.4981 7.29134 13.0081C7.29134 12.5181 7.68801 12.1331 8.16634 12.1331H15.1663C15.6447 12.1331 16.0413 12.5298 16.0413 13.0081C16.0413 13.4865 15.6447 13.8831 15.1663 13.8831Z" fill="currentColor"/>
+                        <path d="M16.5784 4.64353C16.8818 4.95853 16.6134 5.4252 16.1701 5.4252H7.0351C5.76343 5.4252 4.57343 5.79853 3.58176 6.4402C3.12676 6.73186 2.50843 6.41686 2.7301 5.9152C3.38343 4.38686 4.91176 3.3252 6.67343 3.3252H13.2301C14.5834 3.3252 15.7851 3.80353 16.5784 4.64353Z" fill="currentColor"/>
+                    </svg>
+                    <span class="text-[10px] font-semibold leading-[12px]">Accounts</span>
                 </button>
-                <button onclick="switchTab('history')" id="tab-history" class="tab-btn flex-1 flex flex-col items-center justify-center h-full rounded-full transition-all text-[#8B93A7]">
-                    <i class="ph ph-clock text-[22px] mb-0.5"></i>
-                    <span class="text-[10px] font-semibold">History</span>
+                <button type="button" onclick="switchTab('history')" id="tab-history" class="tab-btn relative -ml-2 flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#F5F7FA]">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.9997 2.3335C7.57134 2.3335 2.33301 7.57183 2.33301 14.0002C2.33301 20.4285 7.57134 25.6668 13.9997 25.6668C20.428 25.6668 25.6663 20.4285 25.6663 14.0002C25.6663 7.57183 20.428 2.3335 13.9997 2.3335ZM19.0747 18.1652C18.9113 18.4452 18.6197 18.5968 18.3163 18.5968C18.1647 18.5968 18.013 18.5618 17.873 18.4685L14.2563 16.3102C13.358 15.7735 12.693 14.5952 12.693 13.5568V8.7735C12.693 8.29516 13.0897 7.8985 13.568 7.8985C14.0463 7.8985 14.443 8.29516 14.443 8.7735V13.5568C14.443 13.9768 14.793 14.5952 15.1547 14.8052L18.7713 16.9635C19.1913 17.2085 19.3313 17.7452 19.0747 18.1652Z" fill="currentColor"/>
+                    </svg>
+                    <span class="text-[10px] font-semibold leading-[12px]">History</span>
                 </button>
             </div>
-            <button onclick="openModal('modal-add-tx')" class="w-[68px] h-[68px] rounded-full bg-[#4C8DFF] flex items-center justify-center text-white shadow-[0_8px_24px_rgba(76,141,255,0.4)] active:scale-95 transition-transform pointer-events-auto">
-                <i class="ph ph-plus text-[32px]"></i>
+            <button type="button" id="fab-add-tx" class="hidden w-[64px] h-[64px] rounded-full bg-[#4C8DFF] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform">
+                <svg width="28" height="28" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 2.42871V13.5716" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
+                    <path d="M2.42871 8H13.5716" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
+                </svg>
             </button>
+        </nav>
+
+        <!-- СПЛЕШ -->
+        <div id="splash">
+            <svg width="64" height="64" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M40.3341 20.1117V23.8884C40.3341 24.8967 39.5274 25.7217 38.5007 25.7584H34.9074C32.9274 25.7584 31.1124 24.31 30.9474 22.33C30.8374 21.175 31.2774 20.0934 32.0474 19.3417C32.7257 18.645 33.6607 18.2417 34.6874 18.2417H38.5007C39.5274 18.2784 40.3341 19.1034 40.3341 20.1117Z" fill="#4C8DFF"/>
+                <path d="M37.5287 28.5082H34.907C31.4237 28.5082 28.4903 25.8865 28.197 22.5498C28.032 20.6432 28.7287 18.7365 30.122 17.3798C31.2953 16.1698 32.927 15.4915 34.687 15.4915H37.5287C38.0603 15.4915 38.5003 15.0515 38.4453 14.5198C38.042 10.0648 35.0903 7.0215 30.7087 6.50817C30.2687 6.43484 29.8103 6.4165 29.3337 6.4165H12.8337C12.3203 6.4165 11.8253 6.45317 11.3487 6.5265C6.67366 7.11317 3.66699 10.5965 3.66699 15.5832V28.4165C3.66699 33.4765 7.77366 37.5832 12.8337 37.5832H29.3337C34.467 37.5832 38.0053 34.3748 38.4453 29.4798C38.5003 28.9482 38.0603 28.5082 37.5287 28.5082ZM23.8337 17.8748H12.8337C12.082 17.8748 11.4587 17.2515 11.4587 16.4998C11.4587 15.7482 12.082 15.1248 12.8337 15.1248H23.8337C24.5853 15.1248 25.2087 15.7482 25.2087 16.4998C25.2087 17.2515 24.5853 17.8748 23.8337 17.8748Z" fill="#4C8DFF"/>
+            </svg>
+            <p class="text-[#8B93A7] text-[14px] font-medium tracking-wide">Kopilka</p>
         </div>
 
-        <!-- МОДАЛКИ -->
-        <div id="modal-add-tx" class="modal-overlay hidden fixed inset-0 z-50 flex flex-col justify-end">
-            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal('modal-add-tx')"></div>
-            <div class="modal-content glass-ui w-full rounded-t-[32px] p-6 relative z-10 pb-12 max-w-[440px] mx-auto">
-                <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
-                <div class="flex justify-between items-center mb-8">
-                    <button onclick="closeModal('modal-add-tx')" class="w-10 h-10 rounded-full bg-[#232730] flex items-center justify-center text-[#8B93A7]"><i class="ph ph-x text-xl"></i></button>
-                    <h2 class="text-[18px] font-semibold">Add Transaction</h2>
-                    <button onclick="saveTransaction()" class="text-[#4C8DFF] font-semibold text-[16px]">Save</button>
-                </div>
-                <div class="bg-[#232730] p-1 rounded-full flex mb-10">
-                    <button id="btn-expense" onclick="setTxType('expense')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm">Expense</button>
-                    <button id="btn-income" onclick="setTxType('income')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium">Income</button>
-                </div>
-                <div class="text-center mb-10">
-                    <input type="number" id="tx-amount" placeholder="0" class="bg-transparent text-[64px] font-bold text-center w-full outline-none placeholder:text-[#8B93A7] leading-none">
-                </div>
-                <div class="mb-6">
-                    <label class="text-[14px] text-[#8B93A7] mb-2 block font-medium">Account</label>
-                    <select id="tx-account" class="w-full bg-[#232730] border border-white/5 rounded-[16px] p-4 text-white outline-none appearance-none text-[16px]"></select>
-                </div>
-                <div class="mb-8">
-                    <label class="text-[14px] text-[#8B93A7] mb-2 block font-medium">Note</label>
-                    <input type="text" id="tx-note" placeholder="Coffee..." class="w-full bg-[#232730] border border-white/5 rounded-[16px] p-4 text-white outline-none placeholder:text-[#8B93A7] text-[16px]">
-                </div>
-                <button onclick="saveTransaction()" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px] active:scale-95 transition-transform">Confirm</button>
-            </div>
-        </div>
-
-        <div id="modal-add-account" class="modal-overlay hidden fixed inset-0 z-50 flex flex-col justify-end">
-            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal('modal-add-account')"></div>
-            <div class="modal-content glass-ui w-full rounded-t-[32px] p-6 relative z-10 text-center pb-12 max-w-[440px] mx-auto">
-                <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-8"></div>
-                <i class="ph ph-lock-key text-[48px] text-white mb-4"></i>
-                <h2 class="text-[22px] font-bold mb-2">Under construction</h2>
-                <p class="text-[#8B93A7] text-[15px] mb-8">This feature will be available soon</p>
-                <button onclick="closeModal('modal-add-account')" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px]">Close</button>
-            </div>
-        </div>
+        <!-- Общий градиент стекла для заливки SVG-иконок (белый 5%) -->
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+            <defs>
+                <linearGradient id="kopilkaGlass" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+                </linearGradient>
+            </defs>
+        </svg>
 
     </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=11"></script>
 </body>
 </html>
