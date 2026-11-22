@@ -186,6 +186,21 @@ button {
     pointer-events: none;
 }
 
+/* Диагностическая плашка (временная) */
+#debug-panel {
+    position: fixed;
+    left: 4px;
+    top: calc(env(safe-area-inset-top, 0px) + 76px);
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.85);
+    color: #0f0;
+    font: 12px/1.6 monospace;
+    padding: 6px 8px;
+    border-radius: 6px;
+    pointer-events: none;
+    white-space: pre;
+}
+
 /* =========================================
    ДЕСКТОП (≥1280px) — остров 375×812
    ========================================= */

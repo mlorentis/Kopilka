@@ -63,21 +63,21 @@ window.visualViewport?.addEventListener('resize', fitAppContainer);
 window.visualViewport?.addEventListener('scroll', fitAppContainer);
 window.addEventListener('orientationchange', fitAppContainer);
 
-// ДИАГНОСТИКА ВРЕМЕННАЯ: плашка видна ВСЕГДА, пока не решим отступ.
-// Пришли скрин с ней из PWA — по цифрам вижу реальную геометрию экрана.
+// ДИАГНОСТИКА ВРЕМЕННАЯ: обновляет статическую плашку из index.html.
+// Видна всегда, даже если этот JS закэширован старый — тогда останется
+// текст "BUILD v8-static". Пришли скрин из PWA.
 function showDebugInfo() {
-    const el = document.createElement('div');
-    el.style.cssText = 'position:fixed;left:4px;top:4px;z-index:9999;background:rgba(0,0,0,.75);color:#0f0;font:10px/1.5 monospace;padding:4px 6px;border-radius:4px;pointer-events:none;white-space:pre;';
+    const el = document.getElementById('debug-panel');
+    if (!el) return;
     const upd = () => {
         const vv = window.visualViewport;
         el.textContent =
-            `v7 standalone=${window.navigator.standalone} dpr=${window.devicePixelRatio}\n` +
+            `BUILD v8 standalone=${window.navigator.standalone} dpr=${window.devicePixelRatio}\n` +
             `innerH=${window.innerHeight} screenH=${window.screen.height} vvH=${vv ? Math.round(vv.height) : '-'} vvTop=${vv ? Math.round(vv.offsetTop) : '-'}\n` +
             `safeB=${getSafeAreaBottom()} contH=${document.querySelector('.app-container').style.height || 'auto'}`;
     };
     upd();
     setInterval(upd, 400);
-    document.body.appendChild(el);
 }
 
 // --- ШАПКА ---

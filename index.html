@@ -29,9 +29,13 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F]">
+
+    <!-- ДИАГНОСТИКА: статическая плашка прямо в HTML — видна даже если JS
+         закэширован старый. Версия BUILD видна сразу. JS обновляет цифры. -->
+    <div id="debug-panel">BUILD v8-static (JS не подхватился)</div>
 
     <div class="app-container">
 
@@ -127,6 +131,6 @@
 
     </div>
 
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=8"></script>
 </body>
 </html>
