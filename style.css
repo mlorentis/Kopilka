@@ -61,12 +61,14 @@ body {
     will-change: transform;
 }
 
-/* Подложка шапки на отдельных страницах: контент скроллится под неё,
-   без подложки он сливался бы с кнопками. Класс вешает openPage. */
+/* Подложка шапки на отдельных страницах: контент скроллится под неё.
+   Класс вешает openPage, снимают closePage И switchTab (иначе заливка
+   протекала на табы после init). Блюр небольшой: большой радиус на iOS
+   пересчитывается каждый кадр скролла — шапка дёргалась. */
 #main-header.page-bg {
-    background-color: rgba(23, 26, 31, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background-color: rgba(23, 26, 31, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 /* СКРОЛЛ-КОНТЕНТ — единственная скроллящаяся колонка */
@@ -78,12 +80,11 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* ТАББАР — flex-ребёнок внизу колонки. Бока 25px. Снизу — большее из
-   16px и сейф-зоны: нет зоны → 16 (веб, старые айфоны), есть → чистая
-   сейф-зона (34 на айфонах с подбородком), наш отступ отключается. */
+/* ТАББАР — flex-ребёнок внизу колонки. Фикс: 16px по бокам, 20px снизу.
+   Без env()/max(): фиксированное значение предсказуемо везде. */
 #tabbar {
     flex: none;
-    padding: 0 16px max(20px, env(safe-area-inset-bottom, 0px));
+    padding: 0 16px 20px;
     z-index: 40;
     pointer-events: none;
 }

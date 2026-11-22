@@ -324,7 +324,8 @@ function openAccountModal() {
     renderAccCurrencyChips();
     updateAccSaveBtn();
     document.getElementById('acc-delete-btn').classList.add('hidden');
-    setTimeout(() => document.getElementById('acc-name').focus(), 100);
+    // Автофокус не делаем: на iOS он дёргает клавиатуру и сдвиг viewport
+    // при входе на страницу — шапка и контент «скачут». Фокус по тапу.
 }
 
 function openEditAccount(id) {
@@ -642,8 +643,9 @@ function switchTab(tab) {
         if (screen) screen.classList.add('hidden');
         if (btn) { btn.classList.remove('active', 'text-[#4C8DFF]'); btn.classList.add('text-[#F5F7FA]'); }
     });
-    // Таббар виден только на табах
+    // Таббар виден только на табах; заливка шапки — только на страницах
     document.getElementById('tabbar')?.classList.remove('hidden');
+    document.getElementById('main-header')?.classList.remove('page-bg');
 
     const activeScreen = document.getElementById(`screen-${tab}`);
     const activeBtn = document.getElementById(`tab-${tab}`);
