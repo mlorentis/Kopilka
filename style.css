@@ -20,6 +20,7 @@ body {
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+    background-color: #171A1F;
 }
 
 input, textarea {
@@ -36,15 +37,17 @@ button {
 }
 
 /* =========================================
-   ЛЕЙАУТ — паттерн «фиксированный корень» (хэндофф):
-   html/body фиксируются на весь экран. В iOS standalone при
-   viewport-fit=cover fixed-крепление идёт к ПОЛНОМУ экрану, тогда как
-   100dvh/100vh вычитают safe-area снизу (~50px). Таббар — flex-ребёнок,
-   не absolute/fixed. Скроллится только main (#app-content).
+   ЛЕЙАУТ — корень .app-container.
+   В iOS standalone WebKit считает 100%/100dvh/100vh БЕЗ нижней
+   safe-area (~34-50px под индикатором Home) — отсюда «белая полоса»
+   под таббаром, если корень задан высотой. При этом position:fixed
+   с inset:0 на ОБЫЧНОМ div крепится к ПОЛНОМУ физическому экрану
+   (fixed на самих html/body WebKit тоже укорачивает — поэтому
+   фиксируем именно контейнер). В standalone контейнер становится
+   fixed и накрывает весь экран, таббар сам отодвигается от индикатора
+   через env(safe-area-inset-bottom). Скроллится только #app-content.
    ========================================= */
 html, body {
-    position: fixed;
-    inset: 0;
     overflow: hidden;
     overscroll-behavior: none;
 }
@@ -61,7 +64,18 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    background-color: transparent;
+    background-color: #171A1F;
+}
+
+/* iOS/Android standalone: контейнер на весь физический экран,
+   включая зону под индикатором Home */
+@media (display-mode: standalone) {
+    .app-container {
+        position: fixed;
+        inset: 0;
+        width: auto;
+        height: auto;
+    }
 }
 
 /* ШАПКА — flex-ребёнок, safe-area сверху внутри */
@@ -107,14 +121,16 @@ body {
     padding-bottom: 24px;
 }
 
-/* ТАББАР — flex-ребёнок внизу колонки. Отступ от края — 20px */
+/* ТАББАР — flex-ребёнок внизу колонки. По макету: 16px сверху,
+   25px по бокам. Снизу — 25px, но не меньше safe-area: на iPhone
+   пилюля встаёт ровно над индикатором Home, фон уходит под него */
 #tabbar {
     flex: none;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     gap: 8px;
-    padding: 0 20px 20px;
+    padding: 16px 25px max(25px, env(safe-area-inset-bottom, 0px));
     z-index: 40;
     pointer-events: none;
 }
@@ -210,7 +226,7 @@ body {
 }
 
 /* =========================================
-   МОДАЛКИ — absolute внутри dvh-контейнера.
+   МОДАЛКИ — absolute внутри .app-container.
    Покрывают весь физический экран (включая зону под индикатором),
    в отличие от position:fixed, который крепится к layout viewport.
    Контент под модалкой блокируется по скроллу из JS.
@@ -277,7 +293,9 @@ body {
 }
 
 /* =========================================
-   ДЕСКТОП (≥1280px) — остров 375×812
+   ДЕСКТОП (≥1280px) — остров 375×812.
+   position:relative + inset:auto сбрасывают standalone-fixed,
+   если PWA установлено и на десктопе.
    ========================================= */
 @media (min-width: 1280px) {
     body {
@@ -285,6 +303,8 @@ body {
     }
 
     .app-container {
+        position: relative;
+        inset: auto;
         width: 375px;
         height: 812px;
         max-height: 100dvh;
@@ -292,4 +312,14 @@ body {
         background-color: #171A1F;
         overflow: hidden;
     }
+}
+
+/* TEMP: pipeline test marker — удалить после подтверждения */
+#block-empty > p::after {
+    content: "TEST";
+    display: block;
+    margin-top: 16px;
+    color: #4C8DFF;
+    font: 600 12px/16px Inter, system-ui, sans-serif;
+    letter-spacing: 0.2em;
 }
