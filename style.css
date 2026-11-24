@@ -36,17 +36,7 @@ button {
     cursor: pointer;
 }
 
-/* =========================================
-   ЛЕЙАУТ — корень .app-container.
-   В iOS standalone WebKit считает 100%/100dvh/100vh БЕЗ нижней
-   safe-area (~34-50px под индикатором Home) — отсюда «белая полоса»
-   под таббаром, если корень задан высотой. При этом position:fixed
-   с inset:0 на ОБЫЧНОМ div крепится к ПОЛНОМУ физическому экрану
-   (fixed на самих html/body WebKit тоже укорачивает — поэтому
-   фиксируем именно контейнер). В standalone контейнер становится
-   fixed и накрывает весь экран, таббар сам отодвигается от индикатора
-   через env(safe-area-inset-bottom). Скроллится только #app-content.
-   ========================================= */
+/* ЛЕЙАУТ: корень .app-container; iOS standalone fix через -webkit-fill-available */
 html, body {
     overflow: hidden;
     overscroll-behavior: none;
@@ -69,14 +59,7 @@ body {
 
 /* iOS/Android standalone: контейнер на весь физический экран,
    включая зону под индикатором Home */
-@media (display-mode: standalone) {
-    .app-container {
-        position: fixed;
-        inset: 0;
-        width: auto;
-        height: auto;
-    }
-}
+@media (display-mode:standalone){.app-container{position:fixed;top:0;left:0;right:0;bottom:auto;width:auto;height:100lvh;height:-webkit-fill-available;min-height:-webkit-fill-available}}
 
 /* ШАПКА — flex-ребёнок, safe-area сверху внутри */
 #main-header {
