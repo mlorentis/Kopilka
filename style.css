@@ -303,3 +303,7 @@ body {
         overflow: hidden;
     }
 }
+
+/* NO-TABBAR: нижней навигации больше нет, контенту оставляем только safe-area */
+#tabbar { display: none !important; }
+.screen { padding-bottom: max(24px, env(safe-area-inset-bottom, 0px)); }
