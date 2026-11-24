@@ -31,7 +31,7 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=25">
+    <link rel="stylesheet" href="style.css?v=26">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F]">
 
@@ -47,65 +47,30 @@
 
             <!-- ЭКРАН: HOME -->
             <main id="screen-home" class="screen">
-                <!-- ПУСТОЕ СОСТОЯНИЕ -->
-                <div id="block-empty" class="hidden flex-1 flex flex-col items-center justify-center text-center">
-                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M40.3341 20.1117V23.8884C40.3341 24.8967 39.5274 25.7217 38.5007 25.7584H34.9074C32.9274 25.7584 31.1124 24.31 30.9474 22.33C30.8374 21.175 31.2774 20.0934 32.0474 19.3417C32.7257 18.645 33.6607 18.2417 34.6874 18.2417H38.5007C39.5274 18.2784 40.3341 19.1034 40.3341 20.1117Z" fill="#F5F7FA"/>
-                        <path d="M37.5287 28.5082H34.907C31.4237 28.5082 28.4903 25.8865 28.197 22.5498C28.032 20.6432 28.7287 18.7365 30.122 17.3798C31.2953 16.1698 32.927 15.4915 34.687 15.4915H37.5287C38.0603 15.4915 38.5003 15.0515 38.4453 14.5198C38.042 10.0648 35.0903 7.0215 30.7087 6.50817C30.2687 6.43484 29.8103 6.4165 29.3337 6.4165H12.8337C12.3203 6.4165 11.8253 6.45317 11.3487 6.5265C6.67366 7.11317 3.66699 10.5965 3.66699 15.5832V28.4165C3.66699 33.4765 7.77366 37.5832 12.8337 37.5832H29.3337C34.467 37.5832 38.0053 34.3748 38.4453 29.4798C38.5003 28.9482 38.0603 28.5082 37.5287 28.5082ZM23.8337 17.8748H12.8337C12.082 17.8748 11.4587 17.2515 11.4587 16.4998C11.4587 15.7482 12.082 15.1248 12.8337 15.1248H23.8337C24.5853 15.1248 25.2087 15.7482 25.2087 16.4998C25.2087 17.2515 24.5853 17.8748 23.8337 17.8748Z" fill="#F5F7FA"/>
-                    </svg>
-                    <div class="h-4"></div>
-                    <h2 class="text-[22px] font-semibold">Add your first account</h2>
-                    <div class="h-2"></div>
-                    <p class="text-[#8B93A7] text-[14px] leading-[17px] font-normal">Track cash, cards, or crypto in one place</p>
-                    <div class="h-6"></div>
-                    <button type="button" onclick="openAccountModal()" class="glass-ui text-white font-semibold text-[15px] h-[44px] px-6 rounded-full flex items-center gap-2 active:scale-95 transition-transform">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 2.42871V13.5716" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
-                            <path d="M2.42871 8H13.5716" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
-                        </svg>
-                        Add Account
-                    </button>
-                </div>
-
-                <!-- NET WORTH -->
-                <div id="block-networth" class="hidden flex-col items-center mb-6 py-8">
+                <!-- NET WORTH (по макету виден всегда, даже в пустом состоянии) -->
+                <div id="block-networth" class="flex-col items-center mb-6 py-8" style="display:flex">
                     <p class="text-[#8B93A7] text-[16px] font-semibold mb-2">Net Worth</p>
                     <h1 id="net-worth-amount" class="text-[48px] font-bold leading-[58px] tracking-tight">0<span class="text-[#8B93A7] text-[36px] leading-[44px]">,00 $</span></h1>
                     <p id="delta-row" class="hidden text-[16px] font-medium mt-1"><span id="net-worth-delta" class="text-[#2ECC71]"></span><span class="text-[#8B93A7] ml-1">24h</span></p>
                 </div>
-                <!-- QUICK ACTIONS -->
-                <div id="home-actions" class="hidden grid-cols-2 gap-3 mb-8" style="display:none"></div>
 
-
-                <!-- ASSETS -->
-                <div id="block-assets" class="hidden mb-10">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-[20px] font-semibold">Assets</h2>
-                        <span id="assets-total" class="text-[#8B93A7] text-[15px] font-medium"></span>
-                    </div>
-                    <div id="home-assets-list"></div>
+                <!-- СЕГМЕНТ ASSET / DEBT -->
+                <div id="home-segment" class="glass-ui rounded-full flex h-[46px] p-[3px] mb-6">
+                    <button type="button" id="seg-asset" onclick="ntSetSeg('asset')" class="flex-1 rounded-full text-[15px] font-medium transition-all">Asset</button>
+                    <button type="button" id="seg-debt" onclick="ntSetSeg('debt')" class="flex-1 rounded-full text-[15px] font-medium transition-all">Debt</button>
                 </div>
 
-                <!-- DEBTS -->
-                <div id="block-debts" class="hidden">
-                    <div class="flex justify-between items-center mb-4 cursor-pointer" onclick="toggleDebts()">
-                        <h2 class="text-[20px] font-semibold">Debts <i id="debts-chevron" class="ph ph-caret-down text-[16px] text-[#8B93A7]"></i></h2>
-                        <span id="debts-total" class="text-[#8B93A7] text-[15px] font-medium"></span>
-                    </div>
-                    <div id="home-debts-list" class="hidden"></div>
-                </div>
+                <!-- СЧЕТА: карусель карточек или пустая карточка (рендерит nt.js) -->
+                <div id="home-accounts" class="mb-10"></div>
 
-                <!-- RECENT -->
-                <div id="block-recent" class="hidden mt-10" style="display:none">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-[20px] font-semibold">Recent</h2>
-                        <button type="button" onclick="switchTab('history')" class="text-[#4C8DFF] text-[15px] font-semibold flex items-center gap-1 active:scale-95 transition-transform">All <i class="ph ph-caret-right text-[18px]"></i></button>
-                    </div>
-                    <div id="home-recent-list"></div>
+                <!-- OPERATIONS: 3 последние + переход в историю (рендерит nt.js) -->
+                <div id="block-operations" class="mb-4">
+                    <div id="home-operations-head"></div>
+                    <div id="home-operations-list"></div>
                 </div>
             </main>
 
-            <!-- ЭКРАН: ACCOUNTS -->
+            <!-- ЭКРАН: ACCOUNTS (скрытый, нужен app.js для совместимости) -->
             <main id="screen-accounts" class="screen hidden">
                 <div id="acc-segment" class="glass-ui p-1 rounded-full flex mb-8">
                     <button type="button" id="acc-tab-assets" onclick="setAccountTab('asset')" class="flex-1 py-2.5 rounded-full bg-[#232730] text-white text-[15px] font-medium shadow-sm">Assets</button>
@@ -119,8 +84,32 @@
                 <div id="history-list" class="flex-1 flex flex-col"></div>
             </main>
 
+            <!-- ЭКРАН: PROFILE (страница с шевроном назад) -->
+            <main id="screen-profile" class="screen hidden">
+                <div class="flex flex-col items-center pt-8 mb-10">
+                    <div class="w-20 h-20 rounded-full glass-ui flex items-center justify-center mb-4">
+                        <span class="text-[32px] font-semibold leading-none">M</span>
+                    </div>
+                    <h2 class="text-[24px] font-bold tracking-tight">Mikhail</h2>
+                </div>
+                <div class="glass-ui rounded-[32px] p-6 mb-6">
+                    <p class="text-[15px] text-[#8B93A7] mb-1">Accounts: <span id="profile-acc-count" class="text-[#F5F7FA] font-medium"></span></p>
+                    <p class="text-[15px] text-[#8B93A7] mb-6">Transactions: <span id="profile-tx-count" class="text-[#F5F7FA] font-medium"></span></p>
+                    <button type="button" onclick="resetAllData()" class="w-full bg-[#FF6B6B]/10 text-[#FF6B6B] font-semibold text-[15px] h-11 rounded-full active:scale-95 transition-transform">Reset all data</button>
+                </div>
+                <p class="text-[#8B93A7] text-[13px] text-center">Clears accounts and transactions,<br>returns the app to empty state</p>
+            </main>
+
         </div>
 
+        <!-- FAB: добавление транзакции. absolute внутри .app-container,
+             50px от низа контейнера — для FAB это норм -->
+        <button type="button" id="fab-add" onclick="openTxModal()" aria-label="Add transaction" style="display:none">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 5.8335V22.1668" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5.8335 14H22.1668" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
 
         <!-- МОДАЛКА: ADD / EDIT ACCOUNT -->
         <div id="modal-account" class="modal-overlay hidden">
@@ -221,29 +210,6 @@
             </div>
         </div>
 
-        <!-- МОДАЛКА: PROFILE -->
-        <div id="modal-profile" class="modal-overlay hidden">
-            <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-profile')"></div>
-            <div class="modal-sheet">
-                <div class="modal-header">
-                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
-                    <div class="flex justify-between items-center">
-                        <button type="button" onclick="closeModal('modal-profile')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 class="h-11 flex items-center text-[18px] font-semibold">Profile</h2>
-                        <div class="w-11"></div>
-                    </div>
-                </div>
-                <div class="modal-body px-6 pb-12">
-                    <div class="glass-ui rounded-[32px] p-6 mb-6">
-                        <p class="text-[15px] text-[#8B93A7] mb-1">Accounts: <span id="profile-acc-count" class="text-[#F5F7FA] font-medium"></span></p>
-                        <p class="text-[15px] text-[#8B93A7] mb-6">Transactions: <span id="profile-tx-count" class="text-[#F5F7FA] font-medium"></span></p>
-                        <button type="button" onclick="resetAllData()" class="w-full bg-[#FF6B6B]/10 text-[#FF6B6B] font-semibold text-[15px] h-11 rounded-full active:scale-95 transition-transform">Reset all data</button>
-                    </div>
-                    <p class="text-[#8B93A7] text-[13px] text-center">Clears accounts and transactions,<br>returns the app to empty state</p>
-                </div>
-            </div>
-        </div>
-
         <!-- СПЛЕШ -->
         <div id="splash">
             <svg width="64" height="64" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -266,6 +232,6 @@
     </div>
 
     <script src="app.js?v=25"></script>
-    <script src="nt.js?v=1"></script>
+    <script src="nt.js?v=2"></script>
 </body>
 </html>
