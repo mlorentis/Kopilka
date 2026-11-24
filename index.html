@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-    <!-- iOS PWA: честный standalone (системная зона под индикатор Home
-         ~50px webview не отдаёт — дизайн адаптируем под неё) -->
+    <!-- iOS PWA: viewport-fit=cover отдаёт webview весь экран, включая
+         зону под индикатором Home. В standalone корень приложения
+         (.app-container) крепится position:fixed inset:0 — см. style.css -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,7 +31,7 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=22">
+    <link rel="stylesheet" href="style.css?v=25">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F]">
 
@@ -72,6 +73,9 @@
                     <h1 id="net-worth-amount" class="text-[48px] font-bold leading-[58px] tracking-tight">0<span class="text-[#8B93A7] text-[36px] leading-[44px]">,00 $</span></h1>
                     <p id="delta-row" class="hidden text-[16px] font-medium mt-1"><span id="net-worth-delta" class="text-[#2ECC71]"></span><span class="text-[#8B93A7] ml-1">24h</span></p>
                 </div>
+                <!-- QUICK ACTIONS -->
+                <div id="home-actions" class="hidden grid-cols-2 gap-3 mb-8" style="display:none"></div>
+
 
                 <!-- ASSETS -->
                 <div id="block-assets" class="hidden mb-10">
@@ -89,6 +93,15 @@
                         <span id="debts-total" class="text-[#8B93A7] text-[15px] font-medium"></span>
                     </div>
                     <div id="home-debts-list" class="hidden"></div>
+                </div>
+
+                <!-- RECENT -->
+                <div id="block-recent" class="hidden mt-10" style="display:none">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-[20px] font-semibold">Recent</h2>
+                        <button type="button" onclick="switchTab('history')" class="text-[#4C8DFF] text-[15px] font-semibold flex items-center gap-1 active:scale-95 transition-transform">All <i class="ph ph-caret-right text-[18px]"></i></button>
+                    </div>
+                    <div id="home-recent-list"></div>
                 </div>
             </main>
 
@@ -108,38 +121,6 @@
 
         </div>
 
-        <!-- ТАББАР: flex-ребёнок внизу колонки. 20px снизу, 20px по бокам -->
-        <nav id="tabbar">
-            <div id="tab-pill" class="glass-ui rounded-full flex items-center p-1.5 h-[64px] flex-1 relative">
-                <div id="tab-indicator"></div>
-                <button type="button" onclick="switchTab('home')" id="tab-home" class="tab-btn relative flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#4C8DFF] active">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M23.3806 7.95663L16.6606 3.25497C14.8289 1.97163 12.0173 2.04163 10.2556 3.40663L4.4106 7.9683C3.24393 8.8783 2.32227 10.745 2.32227 12.215V20.265C2.32227 23.24 4.73727 25.6666 7.71227 25.6666H20.2889C23.2639 25.6666 25.6789 23.2516 25.6789 20.2766V12.3666C25.6789 10.7916 24.6639 8.85497 23.3806 7.95663ZM14.8756 21C14.8756 21.4783 14.4789 21.875 14.0006 21.875C13.5223 21.875 13.1256 21.4783 13.1256 21V17.5C13.1256 17.0216 13.5223 16.625 14.0006 16.625C14.4789 16.625 14.8756 17.0216 14.8756 17.5V21Z" fill="currentColor"/>
-                    </svg>
-                    <span class="text-[10px] font-semibold leading-[12px]">Home</span>
-                </button>
-                <button type="button" onclick="switchTab('accounts')" id="tab-accounts" class="tab-btn relative -ml-2 flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#F5F7FA]">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M25.6666 14.7232V17.1265C25.6666 17.7799 25.1299 18.3165 24.4649 18.3165H22.2133C20.9533 18.3165 19.7983 17.3949 19.6933 16.1349C19.6233 15.3999 19.9033 14.7115 20.3933 14.2332C20.8249 13.7899 21.4199 13.5332 22.0733 13.5332H24.4649C25.1299 13.5332 25.6666 14.0699 25.6666 14.7232Z" fill="currentColor"/>
-                        <path d="M17.943 16.2865C17.838 15.0615 18.2813 13.8598 19.168 12.9848C19.9147 12.2265 20.953 11.7831 22.073 11.7831H22.738C23.0647 11.7831 23.333 11.5148 23.2863 11.1881C22.9713 8.9248 21.0113 7.1748 18.6663 7.1748H6.99967C4.42134 7.1748 2.33301 9.26314 2.33301 11.8415V20.0081C2.33301 22.5865 4.42134 24.6748 6.99967 24.6748H18.6663C21.023 24.6748 22.9713 22.9248 23.2863 20.6615C23.333 20.3348 23.0647 20.0665 22.738 20.0665H22.213C19.9963 20.0665 18.1297 18.4098 17.943 16.2865ZM15.1663 13.8831H8.16634C7.68801 13.8831 7.29134 13.4981 7.29134 13.0081C7.29134 12.5181 7.68801 12.1331 8.16634 12.1331H15.1663C15.6447 12.1331 16.0413 12.5298 16.0413 13.0081C16.0413 13.4865 15.6447 13.8831 15.1663 13.8831Z" fill="currentColor"/>
-                        <path d="M16.5784 4.64353C16.8818 4.95853 16.6134 5.4252 16.1701 5.4252H7.0351C5.76343 5.4252 4.57343 5.79853 3.58176 6.4402C3.12676 6.73186 2.50843 6.41686 2.7301 5.9152C3.38343 4.38686 4.91176 3.3252 6.67343 3.3252H13.2301C14.5834 3.3252 15.7851 3.80353 16.5784 4.64353Z" fill="currentColor"/>
-                    </svg>
-                    <span class="text-[10px] font-semibold leading-[12px]">Accounts</span>
-                </button>
-                <button type="button" onclick="switchTab('history')" id="tab-history" class="tab-btn relative -ml-2 flex-1 flex flex-col items-center justify-center gap-1 h-full rounded-full transition-all text-[#F5F7FA]">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M13.9997 2.3335C7.57134 2.3335 2.33301 7.57183 2.33301 14.0002C2.33301 20.4285 7.57134 25.6668 13.9997 25.6668C20.428 25.6668 25.6663 20.4285 25.6663 14.0002C25.6663 7.57183 20.428 2.3335 13.9997 2.3335ZM19.0747 18.1652C18.9113 18.4452 18.6197 18.5968 18.3163 18.5968C18.1647 18.5968 18.013 18.5618 17.873 18.4685L14.2563 16.3102C13.358 15.7735 12.693 14.5952 12.693 13.5568V8.7735C12.693 8.29516 13.0897 7.8985 13.568 7.8985C14.0463 7.8985 14.443 8.29516 14.443 8.7735V13.5568C14.443 13.9768 14.793 14.5952 15.1547 14.8052L18.7713 16.9635C19.1913 17.2085 19.3313 17.7452 19.0747 18.1652Z" fill="currentColor"/>
-                    </svg>
-                    <span class="text-[10px] font-semibold leading-[12px]">History</span>
-                </button>
-            </div>
-            <button type="button" id="fab-add-tx" onclick="openTxModal()" class="hidden w-[64px] h-[64px] rounded-full bg-[#4C8DFF] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform">
-                <svg width="28" height="28" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 2.42871V13.5716" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
-                    <path d="M2.42871 8H13.5716" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
-                </svg>
-            </button>
-        </nav>
 
         <!-- МОДАЛКА: ADD / EDIT ACCOUNT -->
         <div id="modal-account" class="modal-overlay hidden">
@@ -284,6 +265,7 @@
 
     </div>
 
-    <script src="app.js?v=22"></script>
+    <script src="app.js?v=25"></script>
+    <script src="nt.js?v=1"></script>
 </body>
 </html>
