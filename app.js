@@ -83,7 +83,6 @@ function setBlock(el, show, display) {
 
 // --- ИНИЦИАЛИЗАЦИЯ ---
 function init() {
-    applyTabbarBottomInset();
     updateFabVisibility();
     renderHome();
     renderAccounts();
@@ -787,17 +786,6 @@ function resetAllData() {
     saveData();
     closeModal('modal-profile');
     init();
-}
-
-// Отступ таббара снизу. Замер на устройстве (iPhone 13 mini, standalone):
-// innerH=762, screenH=812 — нижние 50px под индикатором Home ОС не
-// отдаёт webview (dvh тоже 762). Поэтому в PWA таббар прижимаем вплотную
-// к краю области рисования (margin 0): визуальный зазор = 50px системной
-// зоны, индикатор «плавает» на фоне приложения. В браузере — 20px как раньше.
-function applyTabbarBottomInset() {
-    const tabbar = document.getElementById('tabbar');
-    if (!tabbar) return;
-    tabbar.style.bottom = (window.navigator.standalone === true) ? '0px' : '20px';
 }
 
 // --- СТАРТ ---

@@ -36,31 +36,38 @@ button {
 }
 
 /* =========================================
-   ЛЕЙАУТ — проверенный механизм первой сборки (работает в PWA iOS).
-   Контейнер: position:relative + height:100dvh. Ключ: в standalone PWA
-   dvh разрешается в ПОЛНУЮ физическую высоту экрана (включая зону под
-   индикатором Home), тогда как window.innerHeight / position:fixed
-   крепятся к layout viewport (короче на зону индикатора). Поэтому
-   absolute-потомки контейнера достают до физического низа.
-   Шапка и таббар — absolute внутри контейнера. Скроллится #app-content.
-   dvh сам ужимается при открытии клавиатуры — костыли не нужны.
+   ЛЕЙАУТ — паттерн «фиксированный корень» (хэндофф):
+   html/body фиксируются на весь экран. В iOS standalone при
+   viewport-fit=cover fixed-крепление идёт к ПОЛНОМУ экрану, тогда как
+   100dvh/100vh вычитают safe-area снизу (~50px). Таббар — flex-ребёнок,
+   не absolute/fixed. Скроллится только main (#app-content).
    ========================================= */
+html, body {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .app-container {
     position: relative;
     width: 100%;
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     background-color: transparent;
 }
 
-/* ШАПКА */
+/* ШАПКА — flex-ребёнок, safe-area сверху внутри */
 #main-header {
-    position: absolute;
-    top: env(safe-area-inset-top, 0px);
-    left: 0;
-    right: 0;
+    flex: none;
+    padding-top: env(safe-area-inset-top, 0px);
     z-index: 50;
     pointer-events: none;
 }
@@ -80,14 +87,14 @@ button {
     -webkit-backdrop-filter: blur(10px);
 }
 
-/* СКРОЛЛ-КОНТЕНТ — единственная скроллящаяся колонка */
+/* СКРОЛЛ-КОНТЕНТ — единственная скроллящаяся колонка, между
+   шапкой и таббаром в потоке (padding-top под шапку не нужен) */
 #app-content {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 70px);
 }
 
 /* Экраны */
@@ -100,17 +107,14 @@ button {
     padding-bottom: 24px;
 }
 
-/* ТАББАР — absolute внутри dvh-контейнера: bottom 20px от физ. низа */
+/* ТАББАР — flex-ребёнок внизу колонки. Отступ от края — 20px */
 #tabbar {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 20px;
+    flex: none;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     gap: 8px;
-    padding: 0 20px;
+    padding: 0 20px 20px;
     z-index: 40;
     pointer-events: none;
 }
