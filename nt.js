@@ -446,7 +446,7 @@ function switchTab(tab) {
 // --- FAB-ПИЛЮЛЯ: видна на Home и History, когда есть счета.
 // has-pill добавляет контенту нижний паддинг, чтобы пилюля не перекрывала ---
 function ntUpdateFab() {
-    const fab = document.getElementById('fab-add');
+    const fab = document.getElementById('fab-wrap');
     const content = document.getElementById('app-content');
     if (!fab) return;
     const show = accounts.length > 0 && (ntTab === 'home' || ntTab === 'history');

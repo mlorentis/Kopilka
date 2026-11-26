@@ -31,7 +31,7 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=39">
+    <link rel="stylesheet" href="style.css?v=42">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F]">
 
@@ -129,9 +129,12 @@
 
         </div>
 
-        <!-- FAB-ПИЛЮЛЯ: добавление транзакции. absolute внутри .app-container,
-             по центру, 50px от низа -->
-        <button type="button" id="fab-add" onclick="openTxModal()" data-i18n="addTransaction" style="display:none">Add Transaction</button>
+        <!-- FAB-БЛОК: кнопка добавления транзакции в градиентной подложке
+             (#171A1F 0% → 100% на стопе 90%). Отступы: 24 сверху,
+             20 снизу в вебе / 50 от края экрана в iOS PWA -->
+        <div id="fab-wrap" style="display:none">
+            <button type="button" id="fab-add" onclick="openTxModal()" data-i18n="addTransaction">Add Transaction</button>
+        </div>
 
         <!-- МОДАЛКА: ADD / EDIT ACCOUNT -->
         <div id="modal-account" class="modal-overlay hidden">
@@ -256,6 +259,6 @@
     </div>
 
     <script src="app.js?v=25"></script>
-    <script src="nt.js?v=22"></script>
+    <script src="nt.js?v=23"></script>
 </body>
 </html>

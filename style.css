@@ -194,20 +194,10 @@ body {
     mask-image: linear-gradient(180deg, transparent 0, #000 calc(env(safe-area-inset-top, 0px) + 70px));
 }
 
-/* С FAB-пилюлей — гасим контент и снизу: строки уходят под FAB
-   мягким фейдом вместо жёсткой обрезки о край скролл-зоны */
-#app-content.has-pill {
-    -webkit-mask-image: linear-gradient(180deg,
-        transparent 0,
-        #000 calc(env(safe-area-inset-top, 0px) + 70px),
-        #000 calc(100% - 118px),
-        transparent calc(100% - 100px));
-    mask-image: linear-gradient(180deg,
-        transparent 0,
-        #000 calc(env(safe-area-inset-top, 0px) + 70px),
-        #000 calc(100% - 118px),
-        transparent calc(100% - 100px));
-}
+/* С FAB-блоком нижний фейд контента больше не нужен — переход закрывает
+   градиентная подложка #fab-wrap; остаётся только верхний фейд из базового
+   правила #app-content. Нижний паддинг has-pill (140 = блок ~126 + зазор)
+   сохранён, см. ниже. */
 
 /* Экраны */
 .screen {
@@ -368,6 +358,7 @@ body {
     transform: translateY(0);
 }
 
+
 /* Шапка листа: обычный flex-ребёнок, физически стоит наверху,
    контент за неё не залезает */
 .modal-header {
@@ -422,17 +413,32 @@ body {
 #app-content.has-pill .screen { padding-bottom: 140px; }
 
 /* =========================================
-   FAB-ПИЛЮЛЯ — добавление транзакции.
-   absolute внутри .app-container (в standalone контейнер fixed inset:0),
-   по центру, 20px от низа контейнера
+   FAB-БЛОК — добавление транзакции (спека Figma: W375 H130 hug).
+   Кнопка в градиентной подложке #171A1F: 0% — opacity 0, 90% — opacity 100.
+   Отступы: 24 сверху; снизу 20 в вебе, 50 от края экрана в iOS PWA.
+   absolute внутри .app-container (в standalone контейнер fixed inset:0).
+   Блок пропускает клики сквозь себя — ловит только сама кнопка.
    ========================================= */
-#fab-add {
+#fab-wrap {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    /* 20px от низа; в iOS PWA — поверх safe-area индикатора Home,
-       итого ~54px от края экрана (20 от края там недостижимо) */
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 24px 16px 20px;
+    background: linear-gradient(180deg, rgba(23, 26, 31, 0) 0%, rgba(23, 26, 31, 1) 90%);
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 40;
+}
+
+/* iOS PWA: 50px от нижней границы экрана */
+@media (display-mode: standalone) {
+    #fab-wrap { padding-bottom: 50px; }
+}
+
+#fab-add {
+    pointer-events: auto;
     height: 52px;
     padding: 0 28px;
     border-radius: 999px;
@@ -443,13 +449,12 @@ body {
     font-weight: 600;
     align-items: center;
     justify-content: center;
-    z-index: 40;
     transition: transform 0.15s ease;
     white-space: nowrap;
 }
 
 #fab-add:active {
-    transform: translateX(-50%) scale(0.95);
+    transform: scale(0.95);
 }
 
 /* =========================================
