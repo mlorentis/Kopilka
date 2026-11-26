@@ -948,12 +948,21 @@ if (window.visualViewport) {
     window.visualViewport.addEventListener('scroll', () => { if (ntKbActive) ntKbSync(); });
 }
 
+// --- СТАТУС-БАР: полоса-источник цвета темнеет под открытой модалкой,
+// чтобы зона статус-бара не выбивалась из затемнённого экрана (iOS 26.1+/27
+// красит её в цвет верхнего fixed-элемента — синкаем с бэкдропом 50% чёрного
+// поверх #171A1F ≈ #0C0D10) ---
+function ntTintSync() {
+    const tint = document.getElementById('nt-statusbar-tint');
+    if (tint) tint.classList.toggle('dimmed', !!document.querySelector('.modal-overlay.active'));
+}
+
 // При открытии модалки пилюля встаёт на активную табу (без анимации):
 // setAccType/setTxType в app.js отрабатывают до того, как лист стал видимым.
 const __ntOpenModal = openModal;
 openModal = function (id) {
     __ntOpenModal(id);
-    requestAnimationFrame(() => requestAnimationFrame(ntPillSyncAll));
+    requestAnimationFrame(() => requestAnimationFrame(() => { ntPillSyncAll(); ntTintSync(); }));
 };
 
 const __ntCloseModal = closeModal;
@@ -961,6 +970,7 @@ closeModal = function (id) {
     ntKbActive = false;
     ntKbRestoreAll();
     __ntCloseModal(id);
+    ntTintSync();
 };
 
 // --- RENDER HOME: ядро + наши блоки ---

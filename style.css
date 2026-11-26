@@ -68,6 +68,30 @@ body {
     }
 }
 
+/* Полоса-источник цвета для системного статус-бара (iOS 26.1+/27):
+   Apple deprecated apple-mobile-web-app-status-bar-style, PWA получает
+   принудительный блюр под статус-баром. Единственный способ убрать блюр —
+   фиксированный элемент у верхней кромки (≥6px высотой, ≥80% шириной):
+   статус-бар берёт его сплошной цвет. Цвет = фон приложения, поэтому
+   визуально полоса неотличима от фона. На старых iOS безвредна. */
+#nt-statusbar-tint {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: max(env(safe-area-inset-top, 0px), 6px);
+    background-color: #171A1F;
+    pointer-events: none;
+    z-index: 45;
+    transition: background-color 0.3s ease;
+}
+
+/* Под открытой модалкой: цвет бэкдропа (50% чёрного поверх #171A1F),
+   чтобы зона статус-бара тускнела вместе с экраном (вешает nt.js) */
+#nt-statusbar-tint.dimmed {
+    background-color: #0C0D10;
+}
+
 /* ШАПКА — оверлей поверх контента (absolute), без заливки на главной.
    Контент скроллится ПОД ней и плавно гаснет маской — жёсткой обрезки
    о нижнюю кромку шапки больше нет. */
@@ -176,12 +200,12 @@ body {
     -webkit-mask-image: linear-gradient(180deg,
         transparent 0,
         #000 calc(env(safe-area-inset-top, 0px) + 70px),
-        #000 calc(100% - 140px),
+        #000 calc(100% - 118px),
         transparent calc(100% - 100px));
     mask-image: linear-gradient(180deg,
         transparent 0,
         #000 calc(env(safe-area-inset-top, 0px) + 70px),
-        #000 calc(100% - 140px),
+        #000 calc(100% - 118px),
         transparent calc(100% - 100px));
 }
 
