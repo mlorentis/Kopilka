@@ -395,7 +395,7 @@ function renderHeader(tab) {
     const header = document.getElementById('main-header-inner');
     const hdr = document.getElementById('main-header');
     if (!header || !hdr) return;
-    hdr.classList.remove('scrolled', 'show-title');
+    hdr.classList.remove('scrolled', 'show-title', 'filled');
 
     const back = target => ntCircleBtn(`switchTab('${target}')`, 'Back', '<i class="ph ph-caret-left text-[24px]"></i>');
 
@@ -405,6 +405,8 @@ function renderHeader(tab) {
         return;
     }
     if (tab === 'language' || tab === 'currency') {
+        // Вложенные страницы: навбар с заливкой по дефолту (не только по скроллу)
+        hdr.classList.add('filled');
         const titleKey = tab === 'currency' ? 'mainCurrency' : 'language';
         header.innerHTML = `${back('profile')}<span class="hdr-title">${ntT(titleKey)}</span><div class="w-11"></div>`;
         return;
@@ -447,10 +449,13 @@ function switchTab(tab) {
 // has-pill добавляет контенту нижний паддинг, чтобы пилюля не перекрывала ---
 function ntUpdateFab() {
     const fab = document.getElementById('fab-wrap');
+    const fade = document.getElementById('nt-bottom-fade');
     const content = document.getElementById('app-content');
     if (!fab) return;
     const show = accounts.length > 0 && (ntTab === 'home' || ntTab === 'history');
     fab.style.display = show ? 'flex' : 'none';
+    // Фейд 56px — только там, где нет FAB-блока с его градиентом
+    if (fade) fade.style.display = show ? 'none' : 'block';
     if (content) content.classList.toggle('has-pill', show);
 }
 

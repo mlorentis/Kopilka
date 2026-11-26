@@ -31,7 +31,7 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=42">
+    <link rel="stylesheet" href="style.css?v=46">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F]">
 
@@ -135,6 +135,10 @@
         <div id="fab-wrap" style="display:none">
             <button type="button" id="fab-add" onclick="openTxModal()" data-i18n="addTransaction">Add Transaction</button>
         </div>
+
+        <!-- Нижний фейд 56px для всех страниц БЕЗ FAB-блока (у него свой
+             градиент). Тот же стиль: #171A1F, 0% → opacity 0, 90% → 100 -->
+        <div id="nt-bottom-fade" aria-hidden="true"></div>
 
         <!-- МОДАЛКА: ADD / EDIT ACCOUNT -->
         <div id="modal-account" class="modal-overlay hidden">
@@ -259,6 +263,6 @@
     </div>
 
     <script src="app.js?v=25"></script>
-    <script src="nt.js?v=23"></script>
+    <script src="nt.js?v=25"></script>
 </body>
 </html>

@@ -115,37 +115,38 @@ body {
     align-items: flex-start;
 }
 
-/* Мелкий заголовок по центру навбара (внутренние страницы) */
+/* Мелкий заголовок по центру навбара (внутренние страницы).
+   Появление — мягкое: прозрачность + лёгкий подъём снизу */
 .hdr-title {
     position: absolute;
     left: 50%;
     top: 16px;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(6px);
     height: 44px;
     display: flex;
     align-items: center;
     font-size: 17px;
     font-weight: 600;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.25s ease, transform 0.25s ease;
     pointer-events: none;
     white-space: nowrap;
 }
 
 /* Заголовок виден всегда (History, Profile) */
-#main-header.show-title .hdr-title {
+#main-header.show-title .hdr-title,
+#main-header.scrolled .hdr-title {
     opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
-/* Заливка + заголовок при скролле (Language, Currency — большой заголовок) */
-#main-header.scrolled {
+/* Заливка навбара: .filled — всегда на вложенных страницах
+   (Language, Currency), .scrolled — по скроллу */
+#main-header.scrolled,
+#main-header.filled {
     background-color: rgba(23, 26, 31, 0.9);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-}
-
-#main-header.scrolled .hdr-title {
-    opacity: 1;
 }
 
 /* Круглые кнопки навбара со стеклом (рецепт .glass-ui — см. ниже) */
@@ -248,7 +249,9 @@ body {
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    /* Figma: белый 10%→5% × opacity 20% = 2%→1% — на тёмном фоне читалось
+       как «нет обводки»; подняли до 8%→4%, чтобы штрих был виден */
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -291,6 +294,18 @@ body {
 /* =========================================
    СКРОЛЛБАР / СПЛЕШ
    ========================================= */
+/* Индикация скролла отключена глобально (основной скроллер #app-content,
+   модалки, карусели — везде) */
+*, *::before, *::after {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
 .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -356,6 +371,20 @@ body {
 
 .modal-overlay.active .modal-sheet {
     transform: translateY(0);
+}
+
+/* Нижний фейд 56px в модалках — тот же стиль, что у #fab-wrap:
+   #171A1F, 0% → opacity 0, 90% → 100. Клики проходят сквозь */
+.modal-sheet::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 56px;
+    background: linear-gradient(180deg, rgba(23, 26, 31, 0) 0%, rgba(23, 26, 31, 1) 90%);
+    pointer-events: none;
+    z-index: 2;
 }
 
 
@@ -455,6 +484,19 @@ body {
 
 #fab-add:active {
     transform: scale(0.95);
+}
+
+/* Нижний фейд 56px на страницах без FAB-блока (тот же градиент,
+   что у #fab-wrap). Прячется из ntUpdateFab, когда FAB виден */
+#nt-bottom-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 56px;
+    background: linear-gradient(180deg, rgba(23, 26, 31, 0) 0%, rgba(23, 26, 31, 1) 90%);
+    pointer-events: none;
+    z-index: 39;
 }
 
 /* =========================================
