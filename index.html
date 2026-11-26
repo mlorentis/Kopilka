@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
@@ -31,13 +31,15 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=26">
+    <link rel="stylesheet" href="style.css?v=28">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F]">
 
     <div class="app-container">
 
-        <!-- ШАПКА: flex-ребёнок, физически не скроллится. Контент — JS -->
+        <!-- ШАПКА: flex-ребёнок, физически не скроллится. Контент — JS.
+             На внутренних страницах: шеврон назад + .hdr-title по центру
+             (появляется при скролле на страницах с большим заголовком) -->
         <header id="main-header">
             <div id="main-header-inner"></div>
         </header>
@@ -49,18 +51,18 @@
             <main id="screen-home" class="screen">
                 <!-- NET WORTH (по макету виден всегда, даже в пустом состоянии) -->
                 <div id="block-networth" class="flex-col items-center mb-6 py-8" style="display:flex">
-                    <p class="text-[#8B93A7] text-[16px] font-semibold mb-2">Net Worth</p>
+                    <p class="text-[#8B93A7] text-[16px] font-semibold mb-2" data-i18n="netWorth">Net Worth</p>
                     <h1 id="net-worth-amount" class="text-[48px] font-bold leading-[58px] tracking-tight">0<span class="text-[#8B93A7] text-[36px] leading-[44px]">,00 $</span></h1>
-                    <p id="delta-row" class="hidden text-[16px] font-medium mt-1"><span id="net-worth-delta" class="text-[#2ECC71]"></span><span class="text-[#8B93A7] ml-1">24h</span></p>
+                    <p id="delta-row" onclick="ntCycleDelta()" class="text-[16px] font-medium mt-1 cursor-pointer active:opacity-70 transition-opacity"><span id="net-worth-delta" class="text-[#8B93A7]">0 $</span><span id="delta-period" class="text-[#8B93A7] ml-1">24h</span></p>
                 </div>
 
                 <!-- СЕГМЕНТ ASSET / DEBT -->
                 <div id="home-segment" class="glass-ui rounded-full flex h-[46px] p-[3px] mb-6">
-                    <button type="button" id="seg-asset" onclick="ntSetSeg('asset')" class="flex-1 rounded-full text-[15px] font-medium transition-all">Asset</button>
-                    <button type="button" id="seg-debt" onclick="ntSetSeg('debt')" class="flex-1 rounded-full text-[15px] font-medium transition-all">Debt</button>
+                    <button type="button" id="seg-asset" onclick="ntSetSeg('asset')" class="flex-1 rounded-full text-[15px] font-medium transition-all" data-i18n="asset">Asset</button>
+                    <button type="button" id="seg-debt" onclick="ntSetSeg('debt')" class="flex-1 rounded-full text-[15px] font-medium transition-all" data-i18n="debt">Debt</button>
                 </div>
 
-                <!-- СЧЕТА: карусель карточек или пустая карточка (рендерит nt.js) -->
+                <!-- СЧЕТА: карусель карточек или карточка Add account (рендерит nt.js) -->
                 <div id="home-accounts" class="mb-10"></div>
 
                 <!-- OPERATIONS: 3 последние + переход в историю (рендерит nt.js) -->
@@ -84,32 +86,49 @@
                 <div id="history-list" class="flex-1 flex flex-col"></div>
             </main>
 
-            <!-- ЭКРАН: PROFILE (страница с шевроном назад) -->
+            <!-- ЭКРАН: PROFILE -->
             <main id="screen-profile" class="screen hidden">
-                <div class="flex flex-col items-center pt-8 mb-10">
-                    <div class="w-20 h-20 rounded-full glass-ui flex items-center justify-center mb-4">
-                        <span class="text-[32px] font-semibold leading-none">M</span>
+                <div class="flex flex-col items-center pt-6 mb-8">
+                    <div class="w-[100px] h-[100px] rounded-full bg-[rgba(255,255,255,0.06)] flex items-center justify-center mb-4">
+                        <span class="text-[36px] font-semibold leading-none">M</span>
                     </div>
-                    <h2 class="text-[24px] font-bold tracking-tight">Mikhail</h2>
+                    <h2 class="text-[28px] font-bold tracking-tight">Mikhail</h2>
                 </div>
-                <div class="glass-ui rounded-[32px] p-6 mb-6">
-                    <p class="text-[15px] text-[#8B93A7] mb-1">Accounts: <span id="profile-acc-count" class="text-[#F5F7FA] font-medium"></span></p>
-                    <p class="text-[15px] text-[#8B93A7] mb-6">Transactions: <span id="profile-tx-count" class="text-[#F5F7FA] font-medium"></span></p>
-                    <button type="button" onclick="resetAllData()" class="w-full bg-[#FF6B6B]/10 text-[#FF6B6B] font-semibold text-[15px] h-11 rounded-full active:scale-95 transition-transform">Reset all data</button>
+                <div class="glass-ui rounded-[24px] px-4 mb-6">
+                    <button type="button" onclick="switchTab('language')" class="nt-set-row">
+                        <span class="nt-set-icon"><i class="ph ph-globe text-[20px]"></i></span>
+                        <span class="flex-1 text-left text-[17px] font-medium" data-i18n="language">Language</span>
+                        <span id="profile-lang-value" class="text-[#8B93A7] text-[16px]">English</span>
+                        <i class="ph ph-caret-right text-[18px] text-[#8B93A7]"></i>
+                    </button>
+                    <div class="h-px bg-white/5 ml-[48px]"></div>
+                    <button type="button" onclick="switchTab('currency')" class="nt-set-row">
+                        <span class="nt-set-icon"><i class="ph ph-currency-dollar text-[20px]"></i></span>
+                        <span class="flex-1 text-left text-[17px] font-medium" data-i18n="mainCurrency">Main Currency</span>
+                        <span id="profile-currency-value" class="text-[#8B93A7] text-[16px]">USD</span>
+                        <i class="ph ph-caret-right text-[18px] text-[#8B93A7]"></i>
+                    </button>
                 </div>
-                <p class="text-[#8B93A7] text-[13px] text-center">Clears accounts and transactions,<br>returns the app to empty state</p>
+                <button type="button" onclick="resetAllData()" class="w-full h-[52px] rounded-full bg-[rgba(255,255,255,0.06)] text-white font-semibold text-[17px] active:scale-95 transition-transform" data-i18n="resetData">Reset Data</button>
+            </main>
+
+            <!-- ЭКРАН: LANGUAGE (большой заголовок + collapsing navbar) -->
+            <main id="screen-language" class="screen hidden">
+                <h1 class="nt-large-title" data-i18n="language">Language</h1>
+                <div id="language-list"></div>
+            </main>
+
+            <!-- ЭКРАН: CURRENCY (большой заголовок + collapsing navbar) -->
+            <main id="screen-currency" class="screen hidden">
+                <h1 class="nt-large-title" data-i18n="mainCurrency">Main Currency</h1>
+                <div id="currency-list"></div>
             </main>
 
         </div>
 
-        <!-- FAB: добавление транзакции. absolute внутри .app-container,
-             50px от низа контейнера — для FAB это норм -->
-        <button type="button" id="fab-add" onclick="openTxModal()" aria-label="Add transaction" style="display:none">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 5.8335V22.1668" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M5.8335 14H22.1668" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
+        <!-- FAB-ПИЛЮЛЯ: добавление транзакции. absolute внутри .app-container,
+             по центру, 50px от низа -->
+        <button type="button" id="fab-add" onclick="openTxModal()" data-i18n="addTransaction" style="display:none">Add Transaction</button>
 
         <!-- МОДАЛКА: ADD / EDIT ACCOUNT -->
         <div id="modal-account" class="modal-overlay hidden">
@@ -118,28 +137,28 @@
                 <div class="modal-header">
                     <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
                     <div class="flex justify-between items-center">
-                        <button type="button" onclick="closeModal('modal-account')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
+                        <button type="button" id="acc-close-btn" onclick="closeModal('modal-account')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
                         <h2 id="acc-modal-title" class="h-11 flex items-center text-[18px] font-semibold">Add Account</h2>
                         <button type="button" id="acc-save-btn" onclick="saveAccount()" class="w-11 h-11 rounded-full glass-ui text-[#8B93A7] flex items-center justify-center transition-transform"><i class="ph ph-check text-xl"></i></button>
                     </div>
                 </div>
                 <div class="modal-body px-6 pb-12">
                     <div class="bg-[#232730] p-1 rounded-full flex mb-8">
-                        <button type="button" id="acc-type-asset" onclick="setAccType('asset')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all">Asset</button>
-                        <button type="button" id="acc-type-debt" onclick="setAccType('debt')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all">Debt</button>
+                        <button type="button" id="acc-type-asset" onclick="setAccType('asset')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all" data-i18n="asset">Asset</button>
+                        <button type="button" id="acc-type-debt" onclick="setAccType('debt')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all" data-i18n="debt">Debt</button>
                     </div>
                     <div class="mb-8">
-                        <input type="text" id="acc-name" oninput="updateAccSaveBtn()" placeholder="Name" class="w-full bg-transparent text-center text-[36px] font-semibold outline-none placeholder:text-[#8B93A7] leading-tight">
+                        <input type="text" id="acc-name" oninput="updateAccSaveBtn()" placeholder="Name" data-i18n-ph="name" class="w-full bg-transparent text-center text-[36px] font-semibold outline-none placeholder:text-[#8B93A7] leading-tight">
                     </div>
                     <div class="mb-8">
-                        <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center">Icon</label>
+                        <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center" data-i18n="icon">Icon</label>
                         <div id="acc-icon-picker" class="flex justify-center gap-3"></div>
                     </div>
                     <div class="mb-10">
-                        <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center">Currencies</label>
+                        <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center" data-i18n="currencies">Currencies</label>
                         <div id="acc-currency-chips" class="flex justify-center gap-2 flex-wrap"></div>
                     </div>
-                    <button type="button" id="acc-delete-btn" onclick="deleteAccount()" class="hidden w-full bg-[#FF6B6B]/10 text-[#FF6B6B] font-semibold text-[15px] py-3.5 rounded-[20px] active:scale-95 transition-transform">Delete Account</button>
+                    <button type="button" id="acc-delete-btn" onclick="deleteAccount()" class="hidden w-full bg-[rgba(255,255,255,0.06)] text-white font-semibold text-[17px] py-4 rounded-full active:scale-95 transition-transform" data-i18n="deleteAccount">Delete Account</button>
                 </div>
             </div>
         </div>
@@ -152,35 +171,37 @@
                     <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
                     <div id="tx-step-1-head" class="flex justify-between items-center">
                         <button type="button" onclick="closeModal('modal-add-tx')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 class="h-11 flex items-center text-[18px] font-semibold">Select Account</h2>
+                        <h2 class="h-11 flex items-center text-[18px] font-semibold" data-i18n="selectAccount">Select Account</h2>
                         <div class="w-11"></div>
                     </div>
                     <div id="tx-step-2-head" class="hidden flex justify-between items-center">
                         <button type="button" onclick="backToTxStep1()" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-arrow-left text-xl"></i></button>
-                        <h2 class="h-11 flex items-center text-[18px] font-semibold">Add Transaction</h2>
+                        <h2 class="h-11 flex items-center text-[18px] font-semibold" data-i18n="addTransaction">Add Transaction</h2>
                         <div class="w-11"></div>
                     </div>
                 </div>
                 <div class="modal-body px-6 pb-12">
                     <div id="tx-step-1"><div id="tx-accounts-list"></div></div>
                     <div id="tx-step-2" class="hidden">
-                        <p class="text-center text-[#8B93A7] text-[14px] mb-6 pt-2">to <span id="tx-selected-account" class="text-[#F5F7FA] font-medium"></span></p>
-                        <div id="tx-currency-chips" class="flex justify-center gap-2 mb-8"></div>
-                        <div class="bg-[#232730] p-1 rounded-full flex mb-8">
-                            <button type="button" id="btn-expense" onclick="setTxType('expense')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm">Expense</button>
-                            <button type="button" id="btn-income" onclick="setTxType('income')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium">Income</button>
-                        </div>
-                        <div class="text-center mb-8">
+                        <p class="text-center text-[#8B93A7] text-[14px] mb-4 pt-2"><span data-i18n="to">to</span> <span id="tx-selected-account" class="text-[#F5F7FA] font-medium"></span></p>
+                        <!-- Сумма сразу под заголовком: при открытии клавиатуры
+                             поле уже над ней, iOS ничего не двигает -->
+                        <div class="text-center mb-6">
                             <div class="flex items-center justify-center">
                                 <input type="text" inputmode="decimal" id="tx-amount" placeholder="0" class="bg-transparent text-[64px] font-bold text-center w-auto outline-none placeholder:text-[#8B93A7] leading-none">
                                 <span id="tx-amount-symbol" class="text-[#8B93A7] text-[24px] font-semibold ml-2 mt-3"></span>
                             </div>
                         </div>
+                        <div id="tx-currency-chips" class="flex justify-center gap-2 mb-8"></div>
+                        <div class="bg-[#232730] p-1 rounded-full flex mb-8">
+                            <button type="button" id="btn-expense" onclick="setTxType('expense')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm" data-i18n="expense">Expense</button>
+                            <button type="button" id="btn-income" onclick="setTxType('income')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium" data-i18n="income">Income</button>
+                        </div>
                         <div class="mb-8">
-                            <label class="text-[14px] text-[#8B93A7] mb-2 block font-medium">Note</label>
+                            <label class="text-[14px] text-[#8B93A7] mb-2 block font-medium" data-i18n="note">Note</label>
                             <input type="text" id="tx-note" placeholder="Coffee..." class="w-full bg-[#232730] border border-white/5 rounded-[16px] p-4 outline-none placeholder:text-[#8B93A7] text-[16px]">
                         </div>
-                        <button type="button" onclick="saveTransaction()" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px] active:scale-95 transition-transform">Confirm</button>
+                        <button type="button" onclick="saveTransaction()" class="w-full bg-[#4C8DFF] text-white font-semibold text-[17px] py-4 rounded-[20px] active:scale-95 transition-transform" data-i18n="confirm">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -194,16 +215,16 @@
                     <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
                     <div class="flex justify-between items-center">
                         <button type="button" onclick="closeModal('modal-account-detail')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 id="ad-header-name" class="h-11 flex items-center text-[18px] font-semibold"></h2>
+                        <h2 id="ad-header-name" class="h-11 flex items-center text-[15px] font-semibold max-w-[200px] truncate"></h2>
                         <button type="button" id="ad-edit-btn" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-pencil-simple text-xl"></i></button>
                     </div>
                 </div>
                 <div class="modal-body px-6 pb-12">
                     <div class="flex flex-col items-center mb-10 px-4">
-                        <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-[linear-gradient(135deg,rgba(76,141,255,0.25),rgba(76,141,255,0.05))]">
+                        <div id="ad-icon-wrap" class="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-[rgba(255,255,255,0.06)]">
                             <span id="ad-icon" class="flex items-center justify-center"></span>
                         </div>
-                        <h3 id="ad-name" class="text-[32px] font-bold text-center leading-[38px] break-words"></h3>
+                        <h3 id="ad-name" class="text-[34px] font-bold text-center leading-[40px] break-words"></h3>
                     </div>
                     <div id="ad-balances"></div>
                 </div>
@@ -232,6 +253,6 @@
     </div>
 
     <script src="app.js?v=25"></script>
-    <script src="nt.js?v=2"></script>
+    <script src="nt.js?v=5"></script>
 </body>
 </html>
