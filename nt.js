@@ -18,7 +18,10 @@ let ntSeg = 'asset';
 let ntTab = 'home';
 
 // Знак валюты по дефолту; если общепринятого знака нет — код валюты (BYN)
-const NT_CURRENCY_SYMBOLS = { USD: '$', EUR: '€', RUB: '₽' };
+const NT_CURRENCY_SYMBOLS = {
+    USD: '$', EUR: '€', RUB: '₽', UAH: '₴', KZT: '₸', INR: '₹', KRW: '₩',
+    TRY: '₺', ILS: '₪', THB: '฿', VND: '₫', NGN: '₦', BRL: 'R$', ZAR: 'R', IDR: 'Rp'
+};
 function ntSym(cur) { return NT_CURRENCY_SYMBOLS[cur] || cur; }
 
 // --- НАСТРОЙКИ (язык + основная валюта + период дельты) ---
@@ -111,21 +114,261 @@ const NT_STRINGS = {
         icon: 'Иконка', currencies: 'Валюты', name: 'Название', to: 'в',
         other: 'Другое', today: 'Сегодня', yesterday: 'Вчера',
         resetConfirm: 'Сбросить все данные? Счета и операции будут удалены.'
+    },
+    am: {
+        netWorth: 'የተጣራ ሀብት', asset: 'ንብረት', debt: 'ዕዳ',
+        operations: 'ግብይቶች', history: 'ታሪክ', profile: 'መገለጫ',
+        language: 'ቋንቋ', mainCurrency: 'ዋና መገባደዳ', resetData: 'ውሂብ አጽዳ',
+        addAccount: 'መለያ ጨምር', addAccountCardTitle: 'መለያ ጨምር',
+        addAccountCardSub: 'ጥሬ ገንዘብ፣ ካርዶች እና ክሪፕቶ በአንድ ቦታ',
+        addTransaction: 'ግብይት ጨምር', selectAccount: 'መለያ ይምረጡ',
+        expense: 'ወጪ', income: 'ገቢ', note: 'ማስታወሻ', confirm: 'ተከናውኗል',
+        editAccount: 'መለያ አስተካክል', deleteAccount: 'መለያ ሰርዝ',
+        icon: 'አዶ', currencies: 'መገባደዳዎች', name: 'ስም', to: 'ወደ',
+        other: 'ሌላ', today: 'ዛሬ', yesterday: 'ትናንት',
+        resetConfirm: 'ሁሉንም ውሂብ ማጽዳት? መለያዎች እና ግብይቶች ይሰረዛሉ።'
+    },
+    ar: {
+        netWorth: 'صافي الثروة', asset: 'أصل', debt: 'دَين',
+        operations: 'العمليات', history: 'السجل', profile: 'الملف الشخصي',
+        language: 'اللغة', mainCurrency: 'العملة الرئيسية', resetData: 'إعادة تعيين البيانات',
+        addAccount: 'إضافة حساب', addAccountCardTitle: 'إضافة حساب',
+        addAccountCardSub: 'النقد والبطاقات والعملات المشفرة في مكان واحد',
+        addTransaction: 'إضافة معاملة', selectAccount: 'اختر الحساب',
+        expense: 'مصروف', income: 'دخل', note: 'ملاحظة', confirm: 'تم',
+        editAccount: 'تعديل الحساب', deleteAccount: 'حذف الحساب',
+        icon: 'الأيقونة', currencies: 'العملات', name: 'الاسم', to: 'إلى',
+        other: 'أخرى', today: 'اليوم', yesterday: 'أمس',
+        resetConfirm: 'إعادة تعيين كل البيانات؟ سيتم حذف الحسابات والمعاملات.'
+    },
+    bn: {
+        netWorth: 'নেট মূল্য', asset: 'সম্পদ', debt: 'ঋণ',
+        operations: 'লেনদেন', history: 'ইতিহাস', profile: 'প্রোফাইল',
+        language: 'ভাষা', mainCurrency: 'প্রধান মুদ্রা', resetData: 'ডেটা রিসেট করুন',
+        addAccount: 'অ্যাকাউন্ট যোগ করুন', addAccountCardTitle: 'অ্যাকাউন্ট যোগ করুন',
+        addAccountCardSub: 'নগদ, কার্ড ও ক্রিপ্টো এক জায়গায়',
+        addTransaction: 'লেনদেন যোগ করুন', selectAccount: 'অ্যাকাউন্ট নির্বাচন করুন',
+        expense: 'খরচ', income: 'আয়', note: 'নোট', confirm: 'সম্পন্ন',
+        editAccount: 'অ্যাকাউন্ট সম্পাদনা', deleteAccount: 'অ্যাকাউন্ট মুছুন',
+        icon: 'আইকন', currencies: 'মুদ্রা', name: 'নাম', to: 'তে',
+        other: 'অন্যান্য', today: 'আজ', yesterday: 'গতকাল',
+        resetConfirm: 'সব ডেটা রিসেট হবে? অ্যাকাউন্ট ও লেনদেন মুছে যাবে।'
+    },
+    'zh-TW': {
+        netWorth: '淨資產', asset: '資產', debt: '負債',
+        operations: '交易', history: '記錄', profile: '個人資料',
+        language: '語言', mainCurrency: '主要貨幣', resetData: '重設資料',
+        addAccount: '新增帳戶', addAccountCardTitle: '新增帳戶',
+        addAccountCardSub: '現金、卡片與加密貨幣集中管理',
+        addTransaction: '新增交易', selectAccount: '選擇帳戶',
+        expense: '支出', income: '收入', note: '備註', confirm: '完成',
+        editAccount: '編輯帳戶', deleteAccount: '刪除帳戶',
+        icon: '圖示', currencies: '貨幣', name: '名稱', to: '至',
+        other: '其他', today: '今天', yesterday: '昨天',
+        resetConfirm: '重設所有資料？帳戶與交易將被刪除。'
+    },
+    de: {
+        netWorth: 'Nettovermögen', asset: 'Vermögen', debt: 'Schulden',
+        operations: 'Vorgänge', history: 'Verlauf', profile: 'Profil',
+        language: 'Sprache', mainCurrency: 'Hauptwährung', resetData: 'Daten zurücksetzen',
+        addAccount: 'Konto hinzufügen', addAccountCardTitle: 'Konto hinzufügen',
+        addAccountCardSub: 'Bargeld, Karten und Krypto an einem Ort',
+        addTransaction: 'Vorgang hinzufügen', selectAccount: 'Konto wählen',
+        expense: 'Ausgabe', income: 'Einnahme', note: 'Notiz', confirm: 'Fertig',
+        editAccount: 'Konto bearbeiten', deleteAccount: 'Konto löschen',
+        icon: 'Symbol', currencies: 'Währungen', name: 'Name', to: 'an',
+        other: 'Sonstiges', today: 'Heute', yesterday: 'Gestern',
+        resetConfirm: 'Alle Daten zurücksetzen? Konten und Vorgänge werden gelöscht.'
+    },
+    hi: {
+        netWorth: 'कुल संपत्ति', asset: 'संपत्ति', debt: 'ऋण',
+        operations: 'लेन-देन', history: 'इतिहास', profile: 'प्रोफ़ाइल',
+        language: 'भाषा', mainCurrency: 'मुख्य मुद्रा', resetData: 'डेटा रीसेट करें',
+        addAccount: 'खाता जोड़ें', addAccountCardTitle: 'खाता जोड़ें',
+        addAccountCardSub: 'नकद, कार्ड और क्रिप्टो एक ही जगह',
+        addTransaction: 'लेन-देन जोड़ें', selectAccount: 'खाता चुनें',
+        expense: 'खर्च', income: 'आय', note: 'नोट', confirm: 'हो गया',
+        editAccount: 'खाता बदलें', deleteAccount: 'खाता हटाएं',
+        icon: 'आइकन', currencies: 'मुद्राएँ', name: 'नाम', to: 'में',
+        other: 'अन्य', today: 'आज', yesterday: 'कल',
+        resetConfirm: 'सारा डेटा रीसेट करें? खाते और लेन-देन हटा दिए जाएंगे।'
+    },
+    id: {
+        netWorth: 'Kekayaan Bersih', asset: 'Aset', debt: 'Utang',
+        operations: 'Operasi', history: 'Riwayat', profile: 'Profil',
+        language: 'Bahasa', mainCurrency: 'Mata Uang Utama', resetData: 'Reset Data',
+        addAccount: 'Tambah Akun', addAccountCardTitle: 'Tambah Akun',
+        addAccountCardSub: 'Uang tunai, kartu, dan kripto di satu tempat',
+        addTransaction: 'Tambah Transaksi', selectAccount: 'Pilih Akun',
+        expense: 'Pengeluaran', income: 'Pemasukan', note: 'Catatan', confirm: 'Selesai',
+        editAccount: 'Ubah Akun', deleteAccount: 'Hapus Akun',
+        icon: 'Ikon', currencies: 'Mata Uang', name: 'Nama', to: 'ke',
+        other: 'Lainnya', today: 'Hari ini', yesterday: 'Kemarin',
+        resetConfirm: 'Reset semua data? Akun dan transaksi akan dihapus.'
+    },
+    it: {
+        netWorth: 'Patrimonio netto', asset: 'Attività', debt: 'Debito',
+        operations: 'Operazioni', history: 'Cronologia', profile: 'Profilo',
+        language: 'Lingua', mainCurrency: 'Valuta principale', resetData: 'Reimposta dati',
+        addAccount: 'Aggiungi conto', addAccountCardTitle: 'Aggiungi conto',
+        addAccountCardSub: 'Contanti, carte e cripto in un unico posto',
+        addTransaction: 'Aggiungi transazione', selectAccount: 'Seleziona conto',
+        expense: 'Spesa', income: 'Entrata', note: 'Nota', confirm: 'Fatto',
+        editAccount: 'Modifica conto', deleteAccount: 'Elimina conto',
+        icon: 'Icona', currencies: 'Valute', name: 'Nome', to: 'a',
+        other: 'Altro', today: 'Oggi', yesterday: 'Ieri',
+        resetConfirm: 'Reimpostare tutti i dati? Conti e transazioni saranno eliminati.'
+    },
+    kk: {
+        netWorth: 'Капитал', asset: 'Актив', debt: 'Қарыз',
+        operations: 'Операциялар', history: 'Тарих', profile: 'Профиль',
+        language: 'Тіл', mainCurrency: 'Негізгі валюта', resetData: 'Деректерді тазалау',
+        addAccount: 'Шот қосу', addAccountCardTitle: 'Шот қосу',
+        addAccountCardSub: 'Қолма-қол ақша, карталар және крипта бір жерде',
+        addTransaction: 'Операция қосу', selectAccount: 'Шотты таңдаңыз',
+        expense: 'Шығыс', income: 'Кіріс', note: 'Жазба', confirm: 'Дайын',
+        editAccount: 'Шотты өзгерту', deleteAccount: 'Шотты жою',
+        icon: 'Белгіше', currencies: 'Валюталар', name: 'Атауы', to: '→',
+        other: 'Басқа', today: 'Бүгін', yesterday: 'Кеше',
+        resetConfirm: 'Барлық деректер тазалансын ба? Шоттар мен операциялар жойылады.'
+    },
+    'pt-BR': {
+        netWorth: 'Patrimônio líquido', asset: 'Ativo', debt: 'Dívida',
+        operations: 'Operações', history: 'Histórico', profile: 'Perfil',
+        language: 'Idioma', mainCurrency: 'Moeda principal', resetData: 'Redefinir dados',
+        addAccount: 'Adicionar conta', addAccountCardTitle: 'Adicionar conta',
+        addAccountCardSub: 'Dinheiro, cartões e cripto em um só lugar',
+        addTransaction: 'Adicionar transação', selectAccount: 'Selecionar conta',
+        expense: 'Despesa', income: 'Receita', note: 'Nota', confirm: 'Concluir',
+        editAccount: 'Editar conta', deleteAccount: 'Excluir conta',
+        icon: 'Ícone', currencies: 'Moedas', name: 'Nome', to: 'para',
+        other: 'Outros', today: 'Hoje', yesterday: 'Ontem',
+        resetConfirm: 'Redefinir todos os dados? Contas e transações serão excluídas.'
+    },
+    'es-419': {
+        netWorth: 'Patrimonio neto', asset: 'Activo', debt: 'Deuda',
+        operations: 'Operaciones', history: 'Historial', profile: 'Perfil',
+        language: 'Idioma', mainCurrency: 'Moneda principal', resetData: 'Restablecer datos',
+        addAccount: 'Agregar cuenta', addAccountCardTitle: 'Agregar cuenta',
+        addAccountCardSub: 'Efectivo, tarjetas y cripto en un solo lugar',
+        addTransaction: 'Agregar transacción', selectAccount: 'Selecciona cuenta',
+        expense: 'Gasto', income: 'Ingreso', note: 'Nota', confirm: 'Listo',
+        editAccount: 'Editar cuenta', deleteAccount: 'Eliminar cuenta',
+        icon: 'Ícono', currencies: 'Monedas', name: 'Nombre', to: 'a',
+        other: 'Otros', today: 'Hoy', yesterday: 'Ayer',
+        resetConfirm: '¿Restablecer todos los datos? Se eliminarán cuentas y transacciones.'
+    },
+    uk: {
+        netWorth: 'Капітал', asset: 'Актив', debt: 'Борг',
+        operations: 'Операції', history: 'Історія', profile: 'Профіль',
+        language: 'Мова', mainCurrency: 'Основна валюта', resetData: 'Скинути дані',
+        addAccount: 'Додати рахунок', addAccountCardTitle: 'Додати рахунок',
+        addAccountCardSub: 'Готівка, картки та крипта в одному місці',
+        addTransaction: 'Додати операцію', selectAccount: 'Оберіть рахунок',
+        expense: 'Витрата', income: 'Дохід', note: 'Нотатка', confirm: 'Готово',
+        editAccount: 'Змінити рахунок', deleteAccount: 'Видалити рахунок',
+        icon: 'Іконка', currencies: 'Валюти', name: 'Назва', to: 'на',
+        other: 'Інше', today: 'Сьогодні', yesterday: 'Вчора',
+        resetConfirm: 'Скинути всі дані? Рахунки та операції будуть видалені.'
+    },
+    uz: {
+        netWorth: 'Kapital', asset: 'Aktiv', debt: 'Qarz',
+        operations: 'Operatsiyalar', history: 'Tarix', profile: 'Profil',
+        language: 'Til', mainCurrency: 'Asosiy valyuta', resetData: "Ma'lumotlarni tozalash",
+        addAccount: "Hisob qo'shish", addAccountCardTitle: "Hisob qo'shish",
+        addAccountCardSub: 'Naqd pul, kartalar va kripto bir joyda',
+        addTransaction: "Operatsiya qo'shish", selectAccount: 'Hisobni tanlang',
+        expense: 'Xarajat', income: 'Daromad', note: 'Izoh', confirm: 'Tayyor',
+        editAccount: "Hisobni o'zgartirish", deleteAccount: "Hisobni o'chirish",
+        icon: 'Belgisi', currencies: 'Valyutalar', name: 'Nomi', to: 'ga',
+        other: 'Boshqa', today: 'Bugun', yesterday: 'Kecha',
+        resetConfirm: "Barcha ma'lumotlar tozalansinmi? Hisoblar va operatsiyalar o'chiriladi."
+    },
+    vi: {
+        netWorth: 'Tài sản ròng', asset: 'Tài sản', debt: 'Nợ',
+        operations: 'Giao dịch', history: 'Lịch sử', profile: 'Hồ sơ',
+        language: 'Ngôn ngữ', mainCurrency: 'Tiền tệ chính', resetData: 'Đặt lại dữ liệu',
+        addAccount: 'Thêm tài khoản', addAccountCardTitle: 'Thêm tài khoản',
+        addAccountCardSub: 'Tiền mặt, thẻ và crypto ở một nơi',
+        addTransaction: 'Thêm giao dịch', selectAccount: 'Chọn tài khoản',
+        expense: 'Chi tiêu', income: 'Thu nhập', note: 'Ghi chú', confirm: 'Xong',
+        editAccount: 'Sửa tài khoản', deleteAccount: 'Xóa tài khoản',
+        icon: 'Biểu tượng', currencies: 'Tiền tệ', name: 'Tên', to: 'vào',
+        other: 'Khác', today: 'Hôm nay', yesterday: 'Hôm qua',
+        resetConfirm: 'Đặt lại toàn bộ dữ liệu? Tài khoản và giao dịch sẽ bị xóa.'
     }
 };
 function ntT(key) {
     return (NT_STRINGS[ntSettings.lang] && NT_STRINGS[ntSettings.lang][key]) || NT_STRINGS.en[key] || key;
 }
 
+// Языки — список как в референсе (Walt). Порядок как на скринах.
 const NT_LANGS = [
     { code: 'en', native: 'English', name: { en: 'English', ru: 'Английский' } },
-    { code: 'ru', native: 'Русский', name: { en: 'Russian', ru: 'Русский' } }
+    { code: 'ru', native: 'Русский', name: { en: 'Russian', ru: 'Русский' } },
+    { code: 'am', native: 'አማርኛ', name: { en: 'Amharic', ru: 'Амхарский' } },
+    { code: 'ar', native: 'العربية', name: { en: 'Arabic', ru: 'Арабский' } },
+    { code: 'bn', native: 'বাংলা', name: { en: 'Bengali', ru: 'Бенгальский' } },
+    { code: 'zh-TW', native: '中文 (繁體)', name: { en: 'Chinese (Traditional)', ru: 'Китайский (традиционный)' } },
+    { code: 'de', native: 'Deutsch', name: { en: 'German', ru: 'Немецкий' } },
+    { code: 'hi', native: 'हिन्दी', name: { en: 'Hindi', ru: 'Хинди' } },
+    { code: 'id', native: 'Bahasa Indonesia', name: { en: 'Indonesian', ru: 'Индонезийский' } },
+    { code: 'it', native: 'Italiano', name: { en: 'Italian', ru: 'Итальянский' } },
+    { code: 'kk', native: 'Қазақша', name: { en: 'Kazakh', ru: 'Казахский' } },
+    { code: 'pt-BR', native: 'Português (Brasil)', name: { en: 'Portuguese (Brazil)', ru: 'Португальский (Бразилия)' } },
+    { code: 'es-419', native: 'Español (Latinoamérica)', name: { en: 'Spanish (Latin America)', ru: 'Испанский (Латинская Америка)' } },
+    { code: 'uk', native: 'Українська', name: { en: 'Ukrainian', ru: 'Украинский' } },
+    { code: 'uz', native: "O'zbekcha", name: { en: 'Uzbek', ru: 'Узбекский' } },
+    { code: 'vi', native: 'Tiếng Việt', name: { en: 'Vietnamese', ru: 'Вьетнамский' } }
 ];
+
+// Валюты — список как в референсе (Walt). Флаги — SVG-ассеты от Михаила
+// в /flags/<CODE>.svg (круглые, 96×96); где файла нет (AED) — эмодзи-фолбэк.
 const NT_CURS = [
-    { code: 'USD', flag: '🇺🇸', name: { en: 'US Dollar', ru: 'Доллар США' } },
+    { code: 'AED', flag: '🇦🇪', name: { en: 'UAE Dirham', ru: 'Дирхам ОАЭ' } },
+    { code: 'ARS', flag: '🇦🇷', name: { en: 'Argentine Peso', ru: 'Аргентинское песо' } },
+    { code: 'BRL', flag: '🇧🇷', name: { en: 'Brazilian Real', ru: 'Бразильский реал' } },
+    { code: 'BYN', flag: '🇧🇾', name: { en: 'Belarusian Ruble', ru: 'Белорусский рубль' } },
+    { code: 'COP', flag: '🇨🇴', name: { en: 'Colombian Peso', ru: 'Колумбийское песо' } },
+    { code: 'EGP', flag: '🇪🇬', name: { en: 'Egyptian Pound', ru: 'Египетский фунт' } },
+    { code: 'ETB', flag: '🇪🇹', name: { en: 'Ethiopian Birr', ru: 'Эфиопский быр' } },
     { code: 'EUR', flag: '🇪🇺', name: { en: 'Euro', ru: 'Евро' } },
-    { code: 'RUB', flag: '🇷🇺', name: { en: 'Russian Ruble', ru: 'Российский рубль' } }
+    { code: 'IDR', flag: '🇮🇩', name: { en: 'Indonesian Rupiah', ru: 'Индонезийская рупия' } },
+    { code: 'ILS', flag: '🇮🇱', name: { en: 'Israeli New Shekel', ru: 'Новый израильский шекель' } },
+    { code: 'INR', flag: '🇮🇳', name: { en: 'Indian Rupee', ru: 'Индийская рупия' } },
+    { code: 'KES', flag: '🇰🇪', name: { en: 'Kenyan Shilling', ru: 'Кенийский шиллинг' } },
+    { code: 'KRW', flag: '🇰🇷', name: { en: 'South Korean Won', ru: 'Южнокорейская вона' } },
+    { code: 'KZT', flag: '🇰🇿', name: { en: 'Kazakhstani Tenge', ru: 'Казахстанский тенге' } },
+    { code: 'MXN', flag: '🇲🇽', name: { en: 'Mexican Peso', ru: 'Мексиканское песо' } },
+    { code: 'MYR', flag: '🇲🇾', name: { en: 'Malaysian Ringgit', ru: 'Малайзийский ринггит' } },
+    { code: 'NGN', flag: '🇳🇬', name: { en: 'Nigerian Naira', ru: 'Нигерийская найра' } },
+    { code: 'RSD', flag: '🇷🇸', name: { en: 'Serbian Dinar', ru: 'Сербский динар' } },
+    { code: 'RUB', flag: '🇷🇺', name: { en: 'Russian Ruble', ru: 'Российский рубль' } },
+    { code: 'SAR', flag: '🇸🇦', name: { en: 'Saudi Riyal', ru: 'Саудовский риал' } },
+    { code: 'THB', flag: '🇹🇭', name: { en: 'Thai Baht', ru: 'Тайский бат' } },
+    { code: 'TRY', flag: '🇹🇷', name: { en: 'Turkish Lira', ru: 'Турецкая лира' } },
+    { code: 'UAH', flag: '🇺🇦', name: { en: 'Ukrainian Hryvnia', ru: 'Украинская гривна' } },
+    { code: 'UGX', flag: '🇺🇬', name: { en: 'Ugandan Shilling', ru: 'Угандийский шиллинг' } },
+    { code: 'USD', flag: '🇺🇸', name: { en: 'US Dollar', ru: 'Доллар США' } },
+    { code: 'UYU', flag: '🇺🇾', name: { en: 'Uruguayan Peso', ru: 'Уругвайское песо' } },
+    { code: 'UZS', flag: '🇺🇿', name: { en: 'Uzbekistani Som', ru: 'Узбекский сум' } },
+    { code: 'VES', flag: '🇻🇪', name: { en: 'Venezuelan Bolívar', ru: 'Венесуэльский боливар' } },
+    { code: 'VND', flag: '🇻🇳', name: { en: 'Vietnamese Dong', ru: 'Вьетнамский донг' } },
+    { code: 'ZAR', flag: '🇿🇦', name: { en: 'South African Rand', ru: 'Южноафриканский рэнд' } }
 ];
+
+// Коды валют, для которых есть SVG-флаг (AED — пока эмодзи).
+const NT_FLAG_SVG = new Set(['AED','ARS','BRL','BYN','COP','EGP','ETB','EUR','IDR','ILS','INR','KES','KRW','KZT','MXN','MYR','NGN','RSD','RUB','SAR','THB','TRY','UAH','UGX','USD','UYU','UZS','VES','VND','ZAR']);
+function ntFlagHTML(c) {
+    if (NT_FLAG_SVG.has(c.code)) return `<img class="nt-flag-img" src="flags/${c.code}.svg" alt="${c.code}" draggable="false">`;
+    return c.flag;
+}
+
+// Чипы валют в модалке счёта живут в app.js (CURRENCIES) —
+// расширяем массив отсюда, app.js не трогаем.
+if (typeof CURRENCIES !== 'undefined') {
+    NT_CURS.forEach(c => { if (!CURRENCIES.includes(c.code)) CURRENCIES.push(c.code); });
+}
 
 function ntScrollTop() {
     const scroller = document.getElementById('app-content');
@@ -162,7 +405,8 @@ function renderHeader(tab) {
         return;
     }
     if (tab === 'language' || tab === 'currency') {
-        header.innerHTML = `${back('profile')}<span class="hdr-title">${ntT(tab)}</span><div class="w-11"></div>`;
+        const titleKey = tab === 'currency' ? 'mainCurrency' : 'language';
+        header.innerHTML = `${back('profile')}<span class="hdr-title">${ntT(titleKey)}</span><div class="w-11"></div>`;
         return;
     }
     header.innerHTML = `
@@ -310,8 +554,8 @@ function ntAddCardHTML() {
         <div class="glass-ui rounded-[32px] p-5 h-[200px] flex flex-col">
             <div class="flex justify-between items-start">
                 <div>
-                    <h2 class="text-[20px] font-semibold">${ntT('addAccountCardTitle')}</h2>
-                    <p class="mt-2 text-[#8B93A7] text-[14px] leading-[20px]">${ntT('addAccountCardSub')}</p>
+                    <h2 class="text-[20px] font-semibold leading-[24px]">${ntT('addAccountCardTitle')}</h2>
+                    <p class="mt-2 text-[#8B93A7] text-[14px] leading-[17px]">${ntT('addAccountCardSub')}</p>
                 </div>
                 ${ntWhiteIcon('back', 56)}
             </div>
@@ -431,7 +675,7 @@ function ntRenderOperations() {
 
     head.innerHTML = `
         <button type="button" onclick="switchTab('history')" class="w-full flex justify-between items-center mb-2 active:opacity-70 transition-opacity">
-            <h2 class="text-[20px] font-semibold">${ntT('operations')}</h2>
+            <h2 class="text-[20px] font-semibold leading-[24px]">${ntT('operations')}</h2>
             <i class="ph ph-caret-right text-[20px] text-[#8B93A7]"></i>
         </button>`;
 
@@ -448,7 +692,7 @@ function ntDayLabel(ts) {
     const diff = Math.round((today - day) / 86400000);
     if (diff === 0) return ntT('today');
     if (diff === 1) return ntT('yesterday');
-    return day.toLocaleDateString(ntSettings.lang === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'long' });
+    return day.toLocaleDateString(ntSettings.lang || 'en', { day: 'numeric', month: 'long' });
 }
 
 renderHistory = function () {
@@ -535,7 +779,7 @@ function ntRenderCurrency() {
     if (!list) return;
     list.innerHTML = NT_CURS.map(c => `
         <button type="button" onclick="ntSetCurrency('${c.code}')" class="w-full flex items-center gap-3 py-3 border-b border-white/5 last:border-0 active:opacity-70 transition-opacity">
-            <span class="nt-flag">${c.flag}</span>
+            <span class="nt-flag">${ntFlagHTML(c)}</span>
             <span class="flex-1 text-left">
                 <span class="block text-[17px] font-medium">${c.name[ntSettings.lang] || c.name.en}</span>
                 <span class="block text-[15px] text-[#8B93A7]">${c.code}</span>
