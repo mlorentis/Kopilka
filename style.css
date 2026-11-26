@@ -68,9 +68,14 @@ body {
     }
 }
 
-/* ШАПКА — flex-ребёнок, safe-area сверху внутри */
+/* ШАПКА — оверлей поверх контента (absolute), без заливки на главной.
+   Контент скроллится ПОД ней и плавно гаснет маской — жёсткой обрезки
+   о нижнюю кромку шапки больше нет. */
 #main-header {
-    flex: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     padding-top: env(safe-area-inset-top, 0px);
     z-index: 50;
     pointer-events: none;
@@ -152,14 +157,18 @@ body {
     -webkit-backdrop-filter: blur(10px);
 }
 
-/* СКРОЛЛ-КОНТЕНТ — единственная скроллящаяся колонка, между
-   шапкой и таббаром в потоке (padding-top под шапку не нужен) */
+/* СКРОЛЛ-КОНТЕНТ — единственная скроллящаяся колонка. Шапка лежит
+   поверх (absolute), поэтому здесь padding-top под неё, а маска-градиент
+   плавно гасит контент, уходящий под прозрачный навбар */
 #app-content {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 70px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 calc(env(safe-area-inset-top, 0px) + 70px));
+    mask-image: linear-gradient(180deg, transparent 0, #000 calc(env(safe-area-inset-top, 0px) + 70px));
 }
 
 /* Экраны */
@@ -373,13 +382,13 @@ body {
 /* =========================================
    FAB-ПИЛЮЛЯ — добавление транзакции.
    absolute внутри .app-container (в standalone контейнер fixed inset:0),
-   по центру, 50px от низа контейнера
+   по центру, 20px от низа контейнера
    ========================================= */
 #fab-add {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 50px;
+    bottom: 20px;
     height: 52px;
     padding: 0 28px;
     border-radius: 999px;

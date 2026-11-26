@@ -1,4 +1,7 @@
-// --- NO-TABBAR OVERRIDE v5 (после app.js) ---
+// --- NO-TABBAR OVERRIDE v7 (после app.js) ---
+// v7: клавиатура — лист уходит под клаву (bottom:0) + паддинг modal-body,
+//     полосы-обрезки между клавой и листом больше нет.
+// v6: живые курсы валют (open.er-api.com) — NW/дельта/итоги в основной валюте.
 // v5: клавиатурный пиннинг листа к visualViewport (паттерн hh.ru).
 // Главная: NW → сегмент → карусель счетов → Operations (3) → FAB-пилюля.
 // History / Profile / Language / Currency — страницы с шевроном назад.
@@ -19,6 +22,45 @@ try {
     if (saved && typeof saved === 'object') ntSettings = { ...ntSettings, ...saved };
 } catch (e) {}
 function ntSaveSettings() { localStorage.setItem('kp_settings', JSON.stringify(ntSettings)); }
+
+// --- КУРСЫ ВАЛЮТ (open.er-api.com — бесплатно, без ключа, CORS открыт) ---
+// База USD: rates[cur] = сколько единиц cur дают за 1 USD.
+// Кэш в localStorage (kp_rates), обновляем не чаще раза в 12 часов
+// (API сам обновляет курсы раз в сутки). Офлайн/ошибка — живём на кэше;
+// если кэша нет вообще — показываем суммы без конвертации, как раньше.
+const NT_RATES_URL = 'https://open.er-api.com/v6/latest/USD';
+const NT_RATES_TTL = 12 * 60 * 60 * 1000;
+let ntRates = null; // { rates: { USD: 1, EUR: 0.92, ... }, fetchedAt: ts }
+try {
+    const savedRates = JSON.parse(localStorage.getItem('kp_rates'));
+    if (savedRates && savedRates.rates) ntRates = savedRates;
+} catch (e) {}
+
+async function ntFetchRates() {
+    if (ntRates && Date.now() - ntRates.fetchedAt < NT_RATES_TTL) return;
+    try {
+        const res = await fetch(NT_RATES_URL);
+        const data = await res.json();
+        if (data && data.result === 'success' && data.rates) {
+            ntRates = { rates: data.rates, fetchedAt: Date.now() };
+            localStorage.setItem('kp_rates', JSON.stringify(ntRates));
+            ntRenderNetWorth();
+            renderHistory();
+        }
+    } catch (e) { /* офлайн — работаем на кэше */ }
+}
+
+// amount из валюты from в основную валюту. Нет курса — возвращаем как есть.
+function ntConvert(amount, from) {
+    const to = ntSettings.currency;
+    if (from === to || !ntRates || !ntRates.rates[from] || !ntRates.rates[to]) return amount;
+    return amount / ntRates.rates[from] * ntRates.rates[to];
+}
+
+// Сумма всех балансов счёта в основной валюте
+function ntAccountTotalMain(acc) {
+    return Object.entries(acc.balances).reduce((s, [cur, b]) => s + ntConvert(b, cur), 0);
+}
 
 // Периоды дельты под Net Worth — переключаются тапом по строке
 const NT_DELTA_PERIODS = [
@@ -222,10 +264,10 @@ function ntRenderAccounts() {
     box.innerHTML = html;
 }
 
-// --- NET WORTH + ДЕЛЬТА за 24h (всегда видимы, знак основной валюты) ---
+// --- NET WORTH + ДЕЛЬТА (всегда видимы, в основной валюте с конвертацией) ---
 function ntRenderNetWorth() {
-    const netWorth = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + getAccountTotal(a), 0)
-        - accounts.filter(a => a.type === 'debt').reduce((s, a) => s + getAccountTotal(a), 0);
+    const netWorth = accounts.filter(a => a.type === 'asset').reduce((s, a) => s + ntAccountTotalMain(a), 0)
+        - accounts.filter(a => a.type === 'debt').reduce((s, a) => s + ntAccountTotalMain(a), 0);
     const sym = ntSym(ntSettings.currency);
 
     const nwEl = document.getElementById('net-worth-amount');
@@ -248,7 +290,7 @@ function ntRenderNetWorth() {
         const since = Date.now() - period.ms;
         const delta = transactions
             .filter(t => new Date(t.date).getTime() >= since)
-            .reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
+            .reduce((s, t) => s + (t.type === 'income' ? 1 : -1) * ntConvert(t.amount, t.currency), 0);
         deltaEl.className = delta > 0 ? 'text-[#2ECC71]' : (delta < 0 ? 'text-[#FF6B6B]' : 'text-[#8B93A7]');
         deltaEl.innerText = delta === 0
             ? `0 ${sym}`
@@ -334,7 +376,7 @@ renderHistory = function () {
     let html = '';
     Object.keys(groups).sort((a, b) => b - a).forEach(key => {
         const txs = groups[key];
-        const total = txs.reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
+        const total = txs.reduce((s, t) => s + (t.type === 'income' ? 1 : -1) * ntConvert(t.amount, t.currency), 0);
         const totalColor = total > 0 ? 'text-[#2ECC71]' : 'text-[#8B93A7]';
         const totalSign = total > 0 ? '+' : (total < 0 ? '−' : '');
         html += `
@@ -501,24 +543,36 @@ renderIconPicker = function () {
     });
 };
 
-// --- КЛАВИАТУРА iOS: пинним лист модалки к visualViewport.
-// Лист сжимается ровно над клавиатурой, контент скроллится внутри,
-// страница сзади не двигается (как у hh.ru). Пока фокус в поле
-// модалки — следим за resize/scroll вьюпорта; при уходе фокуса или
-// закрытии модалки — возвращаем листу CSS-дефолты. ---
+// --- КЛАВИАТУРА iOS: лист уходит ПОД клавиатуру, а не ужимается над ней.
+// bottom листа всегда 0 — нижняя часть просто скрыта за клавой, поэтому
+// полосы обрезанного фона между клавой и листом не существует в принципе.
+// Скролл сохраняется: телу листа добавляем паддинг на высоту клавиатуры,
+// контент долистывается над нею. Если iOS спаннил вьюпорт (offsetTop>0) —
+// поднимаем верх листа, чтобы шапка не уехала за экран. ---
 let ntKbActive = false;
 
 function ntKbSync() {
     const vv = window.visualViewport;
     const container = document.querySelector('.app-container');
-    const sheet = document.querySelector('.modal-overlay.active .modal-sheet');
-    if (!vv || !container || !sheet) return;
+    const overlay = document.querySelector('.modal-overlay.active');
+    if (!vv || !container || !overlay) return;
     if (!ntKbActive) return;
+    const sheet = overlay.querySelector('.modal-sheet');
+    const body = overlay.querySelector('.modal-body');
+    if (!sheet) return;
     const contH = container.clientHeight;
-    const top = vv.offsetTop;
-    const bottom = Math.max(0, contH - (vv.offsetTop + vv.height));
-    sheet.style.top = `calc(env(safe-area-inset-top, 0px) + ${10 + top}px)`;
-    sheet.style.bottom = `${bottom}px`;
+    const covered = Math.max(0, contH - (vv.offsetTop + vv.height));
+    sheet.style.top = `calc(env(safe-area-inset-top, 0px) + ${10 + vv.offsetTop}px)`;
+    sheet.style.bottom = '0px';
+    if (body) body.style.paddingBottom = `calc(48px + ${covered}px)`;
+}
+
+// Фокусное поле над клавиатурой (после того как вьюпорт устаканился)
+function ntKbScrollIntoView() {
+    const el = document.activeElement;
+    if (el && el.matches && el.matches('.modal-overlay input, .modal-overlay textarea')) {
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
 }
 
 function ntKbRestoreAll() {
@@ -526,12 +580,16 @@ function ntKbRestoreAll() {
         sheet.style.top = '';
         sheet.style.bottom = '';
     });
+    document.querySelectorAll('.modal-body').forEach(body => {
+        body.style.paddingBottom = '';
+    });
 }
 
 document.addEventListener('focusin', e => {
     if (!e.target.matches('.modal-overlay input, .modal-overlay textarea')) return;
     ntKbActive = true;
     ntKbSync();
+    setTimeout(ntKbScrollIntoView, 350);
 });
 
 document.addEventListener('focusout', () => {
@@ -545,7 +603,11 @@ document.addEventListener('focusout', () => {
 });
 
 if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => { if (ntKbActive) ntKbSync(); });
+    window.visualViewport.addEventListener('resize', () => {
+        if (!ntKbActive) return;
+        ntKbSync();
+        setTimeout(ntKbScrollIntoView, 120);
+    });
     window.visualViewport.addEventListener('scroll', () => { if (ntKbActive) ntKbSync(); });
 }
 
@@ -570,6 +632,7 @@ renderHome = function () {
 
 function initNoTabbar() {
     ntApplyI18n();
+    ntFetchRates();
     renderHome();
     renderAccounts();
     renderHistory();
