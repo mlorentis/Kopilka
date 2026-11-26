@@ -1,4 +1,9 @@
-// --- NO-TABBAR OVERRIDE v7 (после app.js) ---
+// --- NO-TABBAR OVERRIDE v9 (после app.js) ---
+// v9+: таба 44 / переключалка 54; один счёт — на всю ширину, 2+ — карусель;
+//     подпись периода дельты всегда серая; Add-карта: радиус 32, зазор 8.
+// v8: дизайн-ревью — стекло на кнопках навбара/активной табе/кнопке Add,
+//     белая нулевая дельта, табы 44px/паддинг 4, переключалки 54px,
+//     карточка Add account 200px с иконкой 56.
 // v7: клавиатура — лист уходит под клаву (bottom:0) + паддинг modal-body,
 //     полосы-обрезки между клавой и листом больше нет.
 // v6: живые курсы валют (open.er-api.com) — NW/дельта/итоги в основной валюте.
@@ -204,8 +209,8 @@ function ntSetSeg(seg) {
 }
 
 function ntPaintSeg() {
-    const on = 'flex-1 rounded-full text-[15px] font-medium transition-all bg-[#2E333B] text-white shadow-sm';
-    const off = 'flex-1 rounded-full text-[15px] font-medium transition-all text-[#8B93A7]';
+    const on = 'flex-1 h-[44px] rounded-full text-[15px] font-medium transition-all glass-ui text-white';
+    const off = 'flex-1 h-[44px] rounded-full text-[15px] font-medium transition-all text-[#8B93A7]';
     const a = document.getElementById('seg-asset');
     const d = document.getElementById('seg-debt');
     if (a) a.className = ntSeg === 'asset' ? on : off;
@@ -217,24 +222,28 @@ function ntWhiteIcon(key, size) {
     return accountIcon(key, size).replaceAll('url(#kopilkaGlass)', '#F5F7FA');
 }
 
-// Карточка Add account: заголовок + белая иконка кошелька справа,
-// сабтитр, во всю ширину кнопка "+ Add Account"
+// Карточка Add account: 200px высотой, заголовок + белая иконка
+// кошелька 56×56 справа, сабтитр, стеклянная кнопка "+ Add Account"
+// прижата к низу (отступы карточки 20)
 function ntAddCardHTML() {
     return `
-        <div class="glass-ui rounded-[24px] p-5">
-            <div class="flex justify-between items-center mb-1">
-                <h2 class="text-[20px] font-semibold">${ntT('addAccountCardTitle')}</h2>
-                ${ntWhiteIcon('back', 28)}
+        <div class="glass-ui rounded-[32px] p-5 h-[200px] flex flex-col">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-[20px] font-semibold">${ntT('addAccountCardTitle')}</h2>
+                    <p class="mt-2 text-[#8B93A7] text-[14px] leading-[20px]">${ntT('addAccountCardSub')}</p>
+                </div>
+                ${ntWhiteIcon('back', 56)}
             </div>
-            <p class="text-[#8B93A7] text-[14px] leading-[20px] mb-5 pr-16">${ntT('addAccountCardSub')}</p>
-            <button type="button" onclick="openAccountModal()" class="w-full h-11 rounded-full bg-[rgba(255,255,255,0.06)] text-white font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-95 transition-transform">
+            <button type="button" onclick="openAccountModal()" class="mt-auto w-full h-[54px] rounded-full glass-ui text-white font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-95 transition-transform">
                 ${SVG_PLUS_16} ${ntT('addAccount')}
             </button>
         </div>`;
 }
 
-// --- СЧЕТА: карусель 170×190 — сумма сверху, водяной знак по центру,
-// имя снизу. Пустой сегмент → карточка Add account ---
+// --- СЧЕТА: один счёт — карточка на всю ширину; два и больше —
+// карусель 170×190 (сумма сверху, водяной знак по центру, имя снизу).
+// Пустой сегмент → карточка Add account ---
 function ntRenderAccounts() {
     ntPaintSeg();
     const box = document.getElementById('home-accounts');
@@ -246,7 +255,8 @@ function ntRenderAccounts() {
         return;
     }
 
-    let html = '<div class="cards-row">';
+    const single = filtered.length === 1;
+    let html = single ? '' : '<div class="cards-row">';
     filtered.forEach(acc => {
         const cur = acc.currencies[0] || 'USD';
         const sym = ntSym(cur);
@@ -254,13 +264,13 @@ function ntRenderAccounts() {
         const parts = getMoneyParts(main);
         const sign = (acc.type === 'debt' && main !== 0) || main < 0 ? '−' : '';
         html += `
-            <button type="button" onclick="openAccountDetail('${acc.id}')" class="acc-card glass-ui rounded-[28px] p-4 relative overflow-hidden text-left active:scale-95 transition-transform">
+            <button type="button" onclick="openAccountDetail('${acc.id}')" class="acc-card ${single ? 'acc-card--single' : ''} glass-ui rounded-[28px] p-4 relative overflow-hidden text-left active:scale-95 transition-transform">
                 <p class="relative text-[20px] font-bold leading-[24px]">${sign}${parts.integer}<span class="text-[#8B93A7] text-[15px] font-semibold">,${parts.decimal} ${sym}</span></p>
                 <div class="acc-card-icon">${ntWhiteIcon(acc.icon, 64)}</div>
                 <p class="relative text-[15px] font-medium leading-[18px] truncate">${acc.name}</p>
             </button>`;
     });
-    html += '</div>';
+    if (!single) html += '</div>';
     box.innerHTML = html;
 }
 
@@ -291,11 +301,14 @@ function ntRenderNetWorth() {
         const delta = transactions
             .filter(t => new Date(t.date).getTime() >= since)
             .reduce((s, t) => s + (t.type === 'income' ? 1 : -1) * ntConvert(t.amount, t.currency), 0);
-        deltaEl.className = delta > 0 ? 'text-[#2ECC71]' : (delta < 0 ? 'text-[#FF6B6B]' : 'text-[#8B93A7]');
+        deltaEl.className = delta > 0 ? 'text-[#2ECC71]' : (delta < 0 ? 'text-[#FF6B6B]' : 'text-[#F5F7FA]');
         deltaEl.innerText = delta === 0
             ? `0 ${sym}`
             : `${delta > 0 ? '+' : '−'}${formatMoney(delta)} ${sym}`;
-        if (periodEl) periodEl.innerText = period.label[ntSettings.lang] || period.label.en;
+        if (periodEl) {
+            periodEl.innerText = period.label[ntSettings.lang] || period.label.en;
+            periodEl.className = 'text-[#8B93A7] ml-1';
+        }
     }
 }
 
