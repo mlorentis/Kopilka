@@ -1,6 +1,7 @@
 // --- NO-TABBAR OVERRIDE v9 (после app.js) ---
 // v9+: таба 44 / переключалка 54; один счёт — на всю ширину, 2+ — карусель;
-//     подпись периода дельты всегда серая; Add-карта: радиус 32, зазор 8.
+//     подпись периода дельты всегда серая; Add-карта: радиус 32, зазор 8;
+//     скользящая пилюля табов: стекло на главной, плоская #1A1D24 в модалках.
 // v8: дизайн-ревью — стекло на кнопках навбара/активной табе/кнопке Add,
 //     белая нулевая дельта, табы 44px/паддинг 4, переключалки 54px,
 //     карточка Add account 200px с иконкой 56.
@@ -140,6 +141,13 @@ function ntCircleBtn(onclick, label, inner) {
 // home: аватар + плюс. history/profile: шеврон + заголовок по центру
 // (виден всегда, фон прозрачный). language/currency: шеврон + скрытый
 // заголовок — проявляется вместе с заливкой при скролле (.scrolled).
+// Плюс из макета: 24×24 в навбаре (в кнопке Add Account — SVG_PLUS_16
+// из app.js, это тот же плюс в масштабе 16/24, толщина штриха совпадает).
+const NT_SVG_PLUS_24 = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 3.64258V20.3569" stroke-width="1.995" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
+    <path d="M3.64258 12H20.3569" stroke-width="1.995" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/>
+</svg>`;
+
 function renderHeader(tab) {
     const header = document.getElementById('main-header-inner');
     const hdr = document.getElementById('main-header');
@@ -159,7 +167,7 @@ function renderHeader(tab) {
     }
     header.innerHTML = `
         ${ntCircleBtn("switchTab('profile')", 'Profile', '<span class="text-[20px] font-semibold leading-[24px]">M</span>')}
-        ${ntCircleBtn('openAccountModal()', 'Add account', '<i class="ph ph-plus text-[24px]"></i>')}
+        ${ntCircleBtn('openAccountModal()', 'Add account', NT_SVG_PLUS_24)}
     `;
 }
 
@@ -208,13 +216,85 @@ function ntSetSeg(seg) {
     ntRenderAccounts();
 }
 
+// --- Скользящая стеклянная пилюля для всех сегментов ---
+// Пилюля (.seg-pill.glass-ui) лежит ПОД кнопками и едет к активной
+// с пружинящей кривой. Кнопки прозрачные (CSS .seg-wrap > button),
+// активная отличается только белым текстом.
+function ntPillSync(container) {
+    if (!container) return;
+    container.classList.add('seg-wrap');
+    let pill = container.querySelector(':scope > .seg-pill');
+    let created = false;
+    if (!pill) {
+        pill = document.createElement('div');
+        // На стеклянном треке (главная) — стеклянная пилюля;
+        // на тёмном треке модалок — плоская #1A1D24, как было по дизайну.
+        pill.className = 'seg-pill ' + (container.classList.contains('glass-ui') ? 'glass-ui' : 'seg-pill--flat');
+        container.prepend(pill);
+        created = true;
+        // Tailwind CDN догружает классы (h-[44px] и т.п.) после нашего
+        // первого замера — следим за размерами кнопок и молча пересаживаем
+        // пилюлю, когда они «дозреют». Заодно ловим ресайзы окна.
+        const ro = new ResizeObserver(() => {
+            container.querySelectorAll(':scope > button').forEach(b => {
+                // игнор — просто триггер пересинхронизации
+            });
+            delete pill.dataset.ready;
+            ntPillSync(container);
+        });
+        container.querySelectorAll(':scope > button').forEach(b => ro.observe(b));
+    }
+    const btns = [...container.querySelectorAll(':scope > button')];
+    if (!btns.length) return;
+    const active = btns.find(b => b.className.includes('text-white')) || btns[0];
+    const visible = container.offsetParent !== null;
+    // Прыгаем без анимации: первое появление, скрытый контейнер,
+    // либо пилюля ещё не была спозиционирована на видимом экране.
+    const animate = visible && pill.dataset.ready === '1' && !created;
+    pill.classList.toggle('seg-pill-anim', animate);
+    pill.style.top = active.offsetTop + 'px';
+    pill.style.height = active.offsetHeight + 'px';
+    pill.style.width = active.offsetWidth + 'px';
+    pill.style.transform = `translateX(${active.offsetLeft}px)`;
+    if (visible) pill.dataset.ready = '1';
+    if (!animate) {
+        requestAnimationFrame(() => requestAnimationFrame(() => pill.classList.add('seg-pill-anim')));
+    }
+}
+
+function ntPillSyncAll() {
+    ['home-segment'].forEach(id => ntPillSync(document.getElementById(id)));
+    ['acc-type-asset', 'btn-expense'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) ntPillSync(b.parentElement);
+    });
+}
+
+// Клик по табу любого сегмента → пилюля едет за активной кнопкой
+// (классы кнопкам ставит app.js/ntPaintSeg в том же обработчике).
+document.addEventListener('click', e => {
+    const btn = e.target.closest('.seg-wrap > button');
+    if (!btn) return;
+    requestAnimationFrame(() => ntPillSync(btn.parentElement));
+});
+window.addEventListener('resize', ntPillSyncAll);
+
+// Сегмент может появиться из скрытого состояния (например, шаг 2
+// в Add Transaction) без клика и без openModal — ловим смену классов.
+let ntPillMoQueued = false;
+new MutationObserver(() => {
+    if (ntPillMoQueued) return;
+    ntPillMoQueued = true;
+    requestAnimationFrame(() => { ntPillMoQueued = false; ntPillSyncAll(); });
+}).observe(document.body, { subtree: true, attributeFilter: ['class'] });
+
 function ntPaintSeg() {
-    const on = 'flex-1 h-[44px] rounded-full text-[15px] font-medium transition-all glass-ui text-white';
-    const off = 'flex-1 h-[44px] rounded-full text-[15px] font-medium transition-all text-[#8B93A7]';
+    const base = 'flex-1 h-[44px] rounded-full text-[16px] font-semibold leading-[19px] transition-colors ';
     const a = document.getElementById('seg-asset');
     const d = document.getElementById('seg-debt');
-    if (a) a.className = ntSeg === 'asset' ? on : off;
-    if (d) d.className = ntSeg === 'debt' ? on : off;
+    if (a) a.className = base + (ntSeg === 'asset' ? 'text-white' : 'text-[#8B93A7]');
+    if (d) d.className = base + (ntSeg === 'debt' ? 'text-white' : 'text-[#8B93A7]');
+    ntPillSync(document.getElementById('home-segment'));
 }
 
 // Белая версия иконки счёта (для водяных знаков и тёмных кругов)
@@ -235,7 +315,7 @@ function ntAddCardHTML() {
                 </div>
                 ${ntWhiteIcon('back', 56)}
             </div>
-            <button type="button" onclick="openAccountModal()" class="mt-auto w-full h-[54px] rounded-full glass-ui text-white font-semibold text-[15px] flex items-center justify-center gap-2 active:scale-95 transition-transform">
+            <button type="button" onclick="openAccountModal()" class="mt-auto w-full h-[44px] rounded-full glass-ui text-[#F5F7FA] font-semibold text-[16px] leading-[19px] flex items-center justify-center gap-2 active:scale-95 transition-transform">
                 ${SVG_PLUS_16} ${ntT('addAccount')}
             </button>
         </div>`;
@@ -623,6 +703,14 @@ if (window.visualViewport) {
     });
     window.visualViewport.addEventListener('scroll', () => { if (ntKbActive) ntKbSync(); });
 }
+
+// При открытии модалки пилюля встаёт на активную табу (без анимации):
+// setAccType/setTxType в app.js отрабатывают до того, как лист стал видимым.
+const __ntOpenModal = openModal;
+openModal = function (id) {
+    __ntOpenModal(id);
+    requestAnimationFrame(() => requestAnimationFrame(ntPillSyncAll));
+};
 
 const __ntCloseModal = closeModal;
 closeModal = function (id) {

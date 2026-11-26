@@ -492,3 +492,41 @@ body {
     background: rgba(255, 255, 255, 0.06);
     flex: none;
 }
+
+/* --- Скользящая пилюля табов (сегменты Asset/Debt, Expense/Income) --- */
+.seg-wrap {
+    position: relative;
+}
+.seg-wrap > button {
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    box-shadow: none !important;
+    /* Типографика табов по макету: Inter Semi Bold 16/19 */
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    line-height: 19px !important;
+    letter-spacing: 0 !important;
+}
+.seg-pill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 0;
+}
+.seg-pill-anim {
+    transition: transform 0.45s cubic-bezier(0.30, 1.40, 0.40, 1.00),
+                width 0.45s cubic-bezier(0.30, 1.40, 0.40, 1.00),
+                top 0.45s cubic-bezier(0.30, 1.40, 0.40, 1.00),
+                height 0.45s cubic-bezier(0.30, 1.40, 0.40, 1.00);
+}
+
+/* Плоская пилюля для тёмных треков модалок (бывший bg #1A1D24) */
+.seg-pill--flat {
+    background: #1A1D24;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
+}
