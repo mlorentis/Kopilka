@@ -31,7 +31,7 @@
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
-    <link rel="stylesheet" href="style.css?v=48">
+    <link rel="stylesheet" href="style.css?v=57">
 </head>
 <body class="text-[#F5F7FA] font-sans antialiased bg-[#171A1F]">
 
@@ -60,7 +60,7 @@
                 </div>
 
                 <!-- СЕГМЕНТ ASSET / DEBT -->
-                <div id="home-segment" class="glass-ui rounded-full flex items-center h-[54px] p-1 mb-6">
+                <div id="home-segment" class="glass-ui rounded-full flex items-center h-[54px] p-1 mb-5">
                     <button type="button" id="seg-asset" onclick="ntSetSeg('asset')" class="flex-1 rounded-full text-[15px] font-medium transition-all" data-i18n="asset">Asset</button>
                     <button type="button" id="seg-debt" onclick="ntSetSeg('debt')" class="flex-1 rounded-full text-[15px] font-medium transition-all" data-i18n="debt">Debt</button>
                 </div>
@@ -69,7 +69,7 @@
                 <div id="home-accounts" class="mb-10"></div>
 
                 <!-- OPERATIONS: 3 последние + переход в историю (рендерит nt.js) -->
-                <div id="block-operations" class="mb-4">
+                <div id="block-operations" class="mb-0">
                     <div id="home-operations-head"></div>
                     <div id="home-operations-list"></div>
                 </div>
@@ -91,28 +91,32 @@
 
             <!-- ЭКРАН: PROFILE -->
             <main id="screen-profile" class="screen hidden">
-                <div class="flex flex-col items-center pt-6 mb-8">
-                    <div class="w-[100px] h-[100px] rounded-full bg-[rgba(255,255,255,0.06)] flex items-center justify-center mb-4">
-                        <span class="text-[36px] font-semibold leading-none">M</span>
+                <div class="flex flex-col items-center pt-6 mb-10">
+                    <div class="w-20 h-20 rounded-full bg-[#232730] flex items-center justify-center mb-4">
+                        <span class="text-[28px] font-bold leading-[34px]">M</span>
                     </div>
-                    <h2 class="text-[28px] font-bold tracking-tight">Mikhail</h2>
+                    <h2 class="text-[28px] font-bold leading-[34px] text-center">Mikhail</h2>
                 </div>
-                <div class="glass-ui rounded-[24px] px-4 mb-6">
+                <div class="glass-ui rounded-[24px] px-5 py-[10px] mb-6">
                     <button type="button" onclick="switchTab('language')" class="nt-set-row">
-                        <span class="nt-set-icon"><i class="ph ph-globe text-[20px]"></i></span>
-                        <span class="flex-1 text-left text-[17px] font-medium" data-i18n="language">Language</span>
-                        <span id="profile-lang-value" class="text-[#8B93A7] text-[16px]">English</span>
-                        <i class="ph ph-caret-right text-[18px] text-[#8B93A7]"></i>
+                        <span class="nt-set-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.64957 20.9098C7.61957 20.9098 7.57957 20.9298 7.54957 20.9298C5.60957 19.9698 4.02957 18.3798 3.05957 16.4398C3.05957 16.4098 3.07957 16.3698 3.07957 16.3398C4.29957 16.6998 5.55957 16.9698 6.80957 17.1798C7.02957 18.4398 7.28957 19.6898 7.64957 20.9098Z" fill="#F5F7FA"/><path d="M20.94 16.4498C19.95 18.4398 18.3 20.0498 16.29 21.0198C16.67 19.7498 16.99 18.4698 17.2 17.1798C18.46 16.9698 19.7 16.6998 20.92 16.3398C20.91 16.3798 20.94 16.4198 20.94 16.4498Z" fill="#F5F7FA"/><path d="M21.02 7.71047C19.76 7.33047 18.49 7.02047 17.2 6.80047C16.99 5.51047 16.68 4.23047 16.29 2.98047C18.36 3.97047 20.03 5.64047 21.02 7.71047Z" fill="#F5F7FA"/><path d="M7.65047 3.08957C7.29047 4.30957 7.03047 5.54957 6.82047 6.80957C5.53047 7.00957 4.25047 7.32957 2.98047 7.70957C3.95047 5.69957 5.56047 4.04957 7.55047 3.05957C7.58047 3.05957 7.62047 3.08957 7.65047 3.08957Z" fill="#F5F7FA"/><path d="M15.4898 6.59C13.1698 6.33 10.8298 6.33 8.50977 6.59C8.75977 5.22 9.07977 3.85 9.52977 2.53C9.54977 2.45 9.53977 2.39 9.54977 2.31C10.3398 2.12 11.1498 2 11.9998 2C12.8398 2 13.6598 2.12 14.4398 2.31C14.4498 2.39 14.4498 2.45 14.4698 2.53C14.9198 3.86 15.2398 5.22 15.4898 6.59Z" fill="#F5F7FA"/><path d="M6.59 15.4898C5.21 15.2398 3.85 14.9198 2.53 14.4698C2.45 14.4498 2.39 14.4598 2.31 14.4498C2.12 13.6598 2 12.8498 2 11.9998C2 11.1598 2.12 10.3398 2.31 9.55977C2.39 9.54977 2.45 9.54977 2.53 9.52977C3.86 9.08977 5.21 8.75977 6.59 8.50977C6.34 10.8298 6.34 13.1698 6.59 15.4898Z" fill="#F5F7FA"/><path d="M22.0002 11.9998C22.0002 12.8498 21.8802 13.6598 21.6902 14.4498C21.6102 14.4598 21.5502 14.4498 21.4702 14.4698C20.1402 14.9098 18.7802 15.2398 17.4102 15.4898C17.6702 13.1698 17.6702 10.8298 17.4102 8.50977C18.7802 8.75977 20.1502 9.07977 21.4702 9.52977C21.5502 9.54977 21.6102 9.55977 21.6902 9.55977C21.8802 10.3498 22.0002 11.1598 22.0002 11.9998Z" fill="#F5F7FA"/><path d="M15.4898 17.4102C15.2398 18.7902 14.9198 20.1502 14.4698 21.4702C14.4498 21.5502 14.4498 21.6102 14.4398 21.6902C13.6598 21.8802 12.8398 22.0002 11.9998 22.0002C11.1498 22.0002 10.3398 21.8802 9.54977 21.6902C9.53977 21.6102 9.54977 21.5502 9.52977 21.4702C9.08977 20.1402 8.75977 18.7902 8.50977 17.4102C9.66977 17.5402 10.8298 17.6302 11.9998 17.6302C13.1698 17.6302 14.3398 17.5402 15.4898 17.4102Z" fill="#F5F7FA"/><path d="M15.7633 15.7633C13.2622 16.0789 10.7378 16.0789 8.23667 15.7633C7.92111 13.2622 7.92111 10.7378 8.23667 8.23667C10.7378 7.92111 13.2622 7.92111 15.7633 8.23667C16.0789 10.7378 16.0789 13.2622 15.7633 15.7633Z" fill="#F5F7FA"/></svg></span>
+                        <span class="flex-1 text-left text-[14px] leading-[17px]" data-i18n="language">Language</span>
+                        <span class="flex items-center gap-1 flex-none">
+                            <span id="profile-lang-value" class="text-[#8B93A7] text-[14px] leading-[17px]">English</span>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.16699 13L11.167 8L6.16699 3" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" stroke="#8B93A7"/></svg>
+                        </span>
                     </button>
-                    <div class="h-px bg-white/5 ml-[48px]"></div>
+                    <div class="h-px -mb-px bg-white/10 ml-[34px]"></div>
                     <button type="button" onclick="switchTab('currency')" class="nt-set-row">
-                        <span class="nt-set-icon"><i class="ph ph-currency-dollar text-[20px]"></i></span>
-                        <span class="flex-1 text-left text-[17px] font-medium" data-i18n="mainCurrency">Main Currency</span>
-                        <span id="profile-currency-value" class="text-[#8B93A7] text-[16px]">USD</span>
-                        <i class="ph ph-caret-right text-[18px] text-[#8B93A7]"></i>
+                        <span class="nt-set-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.75 15.9203H13.4C14.05 15.9203 14.59 15.3403 14.59 14.6403C14.59 13.7703 14.28 13.6003 13.77 13.4203L12.76 13.0703V15.9203H12.75Z" fill="#F5F7FA"/><path d="M11.9701 1.90041C6.45007 1.92041 1.98007 6.41041 2.00007 11.9304C2.02007 17.4504 6.51007 21.9204 12.0301 21.9004C17.5501 21.8804 22.0201 17.3904 22.0001 11.8704C21.9801 6.35041 17.4901 1.89041 11.9701 1.90041ZM14.2601 12.0004C15.0401 12.2704 16.0901 12.8504 16.0901 14.6404C16.0901 16.1804 14.8801 17.4204 13.4001 17.4204H12.7501V18.0004C12.7501 18.4104 12.4101 18.7504 12.0001 18.7504C11.5901 18.7504 11.2501 18.4104 11.2501 18.0004V17.4204H10.8901C9.25007 17.4204 7.92007 16.0404 7.92007 14.3404C7.92007 13.9304 8.26007 13.5904 8.67007 13.5904C9.08007 13.5904 9.42007 13.9304 9.42007 14.3404C9.42007 15.2104 10.0801 15.9204 10.8901 15.9204H11.2501V12.5404L9.74007 12.0004C8.96007 11.7304 7.91007 11.1504 7.91007 9.36041C7.91007 7.82041 9.12007 6.58041 10.6001 6.58041H11.2501V6.00041C11.2501 5.59041 11.5901 5.25041 12.0001 5.25041C12.4101 5.25041 12.7501 5.59041 12.7501 6.00041V6.58041H13.1101C14.7501 6.58041 16.0801 7.96041 16.0801 9.66041C16.0801 10.0704 15.7401 10.4104 15.3301 10.4104C14.9201 10.4104 14.5801 10.0704 14.5801 9.66041C14.5801 8.79041 13.9201 8.08041 13.1101 8.08041H12.7501V11.4604L14.2601 12.0004Z" fill="#F5F7FA"/><path d="M9.41992 9.37008C9.41992 10.2401 9.72992 10.4101 10.2399 10.5901L11.2499 10.9401V8.08008H10.5999C9.94992 8.08008 9.41992 8.66008 9.41992 9.37008Z" fill="#F5F7FA"/></svg></span>
+                        <span class="flex-1 text-left text-[14px] leading-[17px]" data-i18n="mainCurrency">Main Currency</span>
+                        <span class="flex items-center gap-1 flex-none">
+                            <span id="profile-currency-value" class="text-[#8B93A7] text-[14px] leading-[17px]">USD</span>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.16699 13L11.167 8L6.16699 3" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round" stroke="#8B93A7"/></svg>
+                        </span>
                     </button>
                 </div>
-                <button type="button" onclick="resetAllData()" class="w-full h-[52px] rounded-full bg-[rgba(255,255,255,0.06)] text-white font-semibold text-[17px] active:scale-95 transition-transform" data-i18n="resetData">Reset Data</button>
+                <button type="button" onclick="resetAllData()" class="w-full h-14 rounded-full bg-[rgba(255,255,255,0.06)] text-[#F5F7FA] font-semibold text-[16px] leading-[19px] active:scale-95 transition-transform" data-i18n="resetData">Reset Data</button>
             </main>
 
             <!-- ЭКРАН: LANGUAGE (большой заголовок + collapsing navbar) -->
@@ -145,28 +149,28 @@
             <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-account')"></div>
             <div class="modal-sheet">
                 <div class="modal-header">
-                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
-                    <div class="flex justify-between items-center">
-                        <button type="button" id="acc-close-btn" onclick="closeModal('modal-account')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 id="acc-modal-title" class="h-11 flex items-center text-[18px] font-semibold">Add Account</h2>
-                        <button type="button" id="acc-save-btn" onclick="saveAccount()" class="w-11 h-11 rounded-full glass-ui text-[#8B93A7] flex items-center justify-center transition-transform"><i class="ph ph-check text-xl"></i></button>
+                    <div class="w-[60px] h-[4px] bg-[#F5F7FA]/10 rounded-full mx-auto mt-[6px] mb-4"></div>
+                    <div class="flex justify-between items-center px-4">
+                        <button type="button" id="acc-close-btn" onclick="closeModal('modal-account')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-[24px]"></i></button>
+                        <h2 id="acc-modal-title" class="h-11 flex items-center text-[16px] leading-[19px] font-semibold text-[#F5F7FA]">Add Account</h2>
+                        <button type="button" id="acc-save-btn" onclick="saveAccount()" class="w-11 h-11 rounded-full btn-glass-flat text-[#8B93A7] flex items-center justify-center transition-transform"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.999 6.50098L8.99902 17.501L3.99902 12.501" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                     </div>
                 </div>
-                <div class="modal-body px-6 pb-12">
-                    <div class="bg-[#232730] p-1 rounded-full flex mb-8 h-[54px]">
+                <div class="modal-body px-4 pt-4 pb-12">
+                    <div class="bg-[#232730] p-1 rounded-full flex mb-[56px] h-[54px]">
                         <button type="button" id="acc-type-asset" onclick="setAccType('asset')" class="flex-1 py-3 rounded-full bg-[#1A1D24] text-white text-[15px] font-medium shadow-sm transition-all" data-i18n="asset">Asset</button>
                         <button type="button" id="acc-type-debt" onclick="setAccType('debt')" class="flex-1 py-3 rounded-full text-[#8B93A7] text-[15px] font-medium transition-all" data-i18n="debt">Debt</button>
                     </div>
-                    <div class="mb-8">
-                        <input type="text" id="acc-name" oninput="updateAccSaveBtn()" placeholder="Name" data-i18n-ph="name" class="w-full bg-transparent text-center text-[36px] font-semibold outline-none placeholder:text-[#8B93A7] leading-tight">
+                    <div class="mb-[56px]">
+                        <input type="text" id="acc-name" oninput="updateAccSaveBtn()" placeholder="Name" data-i18n-ph="name" class="w-full bg-transparent text-center text-[40px] leading-[48px] font-bold outline-none placeholder:text-[#8B93A7]">
                     </div>
-                    <div class="mb-8">
-                        <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center" data-i18n="icon">Icon</label>
-                        <div id="acc-icon-picker" class="flex justify-center gap-3"></div>
+                    <div class="mb-6">
+                        <label class="text-[14px] leading-[17px] text-[#8B93A7] mb-3 block" data-i18n="icon">Icon</label>
+                        <div id="acc-icon-picker" class="flex gap-2 overflow-x-auto"></div>
                     </div>
                     <div class="mb-10">
-                        <label class="text-[14px] text-[#8B93A7] mb-3 block font-medium text-center" data-i18n="currencies">Currencies</label>
-                        <div id="acc-currency-chips" class="flex justify-center gap-2 flex-wrap"></div>
+                        <label class="text-[14px] leading-[17px] text-[#8B93A7] mb-3 block" data-i18n="currencies">Currencies</label>
+                        <div id="acc-currency-chips" class="flex gap-2 flex-wrap"></div>
                     </div>
                     <button type="button" id="acc-delete-btn" onclick="deleteAccount()" class="hidden w-full bg-[rgba(255,255,255,0.06)] text-white font-semibold text-[17px] py-4 rounded-full active:scale-95 transition-transform" data-i18n="deleteAccount">Delete Account</button>
                 </div>
@@ -178,19 +182,19 @@
             <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-add-tx')"></div>
             <div class="modal-sheet">
                 <div class="modal-header">
-                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
-                    <div id="tx-step-1-head" class="flex justify-between items-center">
-                        <button type="button" onclick="closeModal('modal-add-tx')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 class="h-11 flex items-center text-[18px] font-semibold" data-i18n="selectAccount">Select Account</h2>
+                    <div class="w-[60px] h-[4px] bg-[#F5F7FA]/10 rounded-full mx-auto mt-[6px] mb-4"></div>
+                    <div id="tx-step-1-head" class="flex justify-between items-center px-4">
+                        <button type="button" onclick="closeModal('modal-add-tx')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-[24px]"></i></button>
+                        <h2 class="h-11 flex items-center text-[16px] leading-[19px] font-semibold text-[#F5F7FA]" data-i18n="selectAccount">Select Account</h2>
                         <div class="w-11"></div>
                     </div>
-                    <div id="tx-step-2-head" class="hidden flex justify-between items-center">
-                        <button type="button" onclick="backToTxStep1()" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-arrow-left text-xl"></i></button>
-                        <h2 class="h-11 flex items-center text-[18px] font-semibold" data-i18n="addTransaction">Add Transaction</h2>
+                    <div id="tx-step-2-head" class="hidden flex justify-between items-center px-4">
+                        <button type="button" onclick="backToTxStep1()" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-caret-left text-[24px]"></i></button>
+                        <h2 class="h-11 flex items-center text-[16px] leading-[19px] font-semibold text-[#F5F7FA]" data-i18n="addTransaction">Add Transaction</h2>
                         <div class="w-11"></div>
                     </div>
                 </div>
-                <div class="modal-body px-6 pb-12">
+                <div class="modal-body px-4 pt-4 pb-12">
                     <div id="tx-step-1"><div id="tx-accounts-list"></div></div>
                     <div id="tx-step-2" class="hidden">
                         <p class="text-center text-[#8B93A7] text-[14px] mb-4 pt-2"><span data-i18n="to">to</span> <span id="tx-selected-account" class="text-[#F5F7FA] font-medium"></span></p>
@@ -222,14 +226,14 @@
             <div class="absolute inset-0 bg-[#000000]/50" onclick="closeModal('modal-account-detail')"></div>
             <div class="modal-sheet">
                 <div class="modal-header">
-                    <div class="w-[60px] h-[6px] bg-[#F5F7FA]/20 rounded-full mx-auto mb-6"></div>
-                    <div class="flex justify-between items-center">
-                        <button type="button" onclick="closeModal('modal-account-detail')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-xl"></i></button>
-                        <h2 id="ad-header-name" class="h-11 flex items-center text-[15px] font-semibold max-w-[200px] truncate"></h2>
+                    <div class="w-[60px] h-[4px] bg-[#F5F7FA]/10 rounded-full mx-auto mt-[6px] mb-4"></div>
+                    <div class="flex justify-between items-center px-4">
+                        <button type="button" onclick="closeModal('modal-account-detail')" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-x text-[24px]"></i></button>
+                        <h2 id="ad-header-name" class="h-11 flex items-center text-[16px] leading-[19px] font-semibold text-[#F5F7FA] max-w-[200px] truncate"></h2>
                         <button type="button" id="ad-edit-btn" class="w-11 h-11 rounded-full glass-ui flex items-center justify-center text-[#F5F7FA] active:scale-95 transition-transform"><i class="ph ph-pencil-simple text-xl"></i></button>
                     </div>
                 </div>
-                <div class="modal-body px-6 pb-12">
+                <div class="modal-body px-4 pt-4 pb-12">
                     <div class="flex flex-col items-center mb-10 px-4">
                         <div id="ad-icon-wrap" class="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-[rgba(255,255,255,0.06)]">
                             <span id="ad-icon" class="flex items-center justify-center"></span>
@@ -263,6 +267,6 @@
     </div>
 
     <script src="app.js?v=25"></script>
-    <script src="nt.js?v=25"></script>
+    <script src="nt.js?v=34"></script>
 </body>
 </html>

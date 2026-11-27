@@ -170,8 +170,21 @@ body {
 .nt-large-title {
     font-size: 28px;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    margin: 8px 0 16px;
+    margin: 24px 0 16px;
+}
+
+/* Disabled-кнопки: тот же стеклянный градиент, но БЕЗ stroke/теней */
+.btn-glass-flat {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+/* Строки-опции (Language, Currency): 87px, дивайдер white 10% на всю ширину */
+.nt-opt-row {
+    min-height: 87px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+.nt-opt-row:last-child {
+    border-bottom: none;
 }
 
 /* Подложка шапки на отдельных страницах (вешает openPage) */
@@ -502,18 +515,37 @@ body {
 }
 
 /* =========================================
-   КАРУСЕЛЬ СЧЕТОВ (Home): 170×190, сумма сверху,
-   водяной знак-иконка по центру, имя снизу
+   КАРУСЕЛЬ СЧЕТОВ (Home): карточки 200×200, сумма сверху
+   (отступы 20), водяной знак-иконка 100px в правом нижнем
+   углу (белый 10%), имя снизу с многоточием
    ========================================= */
 .cards-row {
     display: flex;
     gap: 12px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    margin: 0 -16px;
+    /* margin-bottom -12 гасит нижний буфер под тень: визуальный
+       зазор карточки → Operations ровно 40 (mb-10 у #home-accounts) */
+    margin: 0 -16px -12px;
     padding: 4px 16px 12px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+}
+
+/* Строка операции (Home + History): дивайдер с отступом
+   от колонки текста (иконка 48 + зазор 16), у последней скрыт */
+.nt-tx-divider {
+    position: absolute;
+    bottom: 0;
+    left: 64px;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.10);
+    pointer-events: none;
+}
+
+.nt-tx-row:last-child .nt-tx-divider {
+    display: none;
 }
 
 .cards-row::-webkit-scrollbar {
@@ -521,28 +553,31 @@ body {
 }
 
 .acc-card {
-    flex: 0 0 170px;
-    width: 170px;
-    height: 190px;
+    flex: 0 0 200px;
+    width: 200px;
+    height: 200px;
     scroll-snap-align: start;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 }
 
 /* Один-единственный счёт в сегменте — карточка на всю ширину,
-   карусель включается со второго счёта */
+   карусель включается со второго счёта. margin-top 4 выравнивает
+   визуальный отступ от сегмента до 24 (у .cards-row есть буфер 4,
+   у одиночной карточки его нет) */
 .acc-card--single {
     flex: none;
     width: 100%;
+    margin-top: 4px;
 }
 
 .acc-card-icon {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0.28;
+    right: 8px;
+    bottom: 8px;
+    width: 100px;
+    height: 100px;
+    opacity: 0.1;
     pointer-events: none;
 }
 
@@ -552,16 +587,15 @@ body {
 .nt-set-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
-    padding: 14px 0;
+    padding: 10px 0;
 }
 
+/* Иконка строки настроек — голая 24×24, без круга (спека Figma) */
 .nt-set-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.06);
+    width: 24px;
+    height: 24px;
     color: #F5F7FA;
     display: flex;
     align-items: center;
@@ -570,14 +604,14 @@ body {
 }
 
 .nt-flag {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 999px;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
+    font-size: 48px;
     line-height: 1;
     background: rgba(255, 255, 255, 0.06);
     flex: none;

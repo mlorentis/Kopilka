@@ -37,6 +37,7 @@ function ntSaveSettings() { localStorage.setItem('kp_settings', JSON.stringify(n
 // Кэш в localStorage (kp_rates), обновляем не чаще раза в 12 часов
 // (API сам обновляет курсы раз в сутки). Офлайн/ошибка — живём на кэше;
 // если кэша нет вообще — показываем суммы без конвертации, как раньше.
+const NT_SVG_CHECK = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-none"><path d="M19.999 6.50098L8.99902 17.501L3.99902 12.501" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#F5F7FA"/></svg>';
 const NT_RATES_URL = 'https://open.er-api.com/v6/latest/USD';
 const NT_RATES_TTL = 12 * 60 * 60 * 1000;
 let ntRates = null; // { rates: { USD: 1, EUR: 0.92, ... }, fetchedAt: ts }
@@ -556,13 +557,13 @@ function ntWhiteIcon(key, size) {
 // прижата к низу (отступы карточки 20)
 function ntAddCardHTML() {
     return `
-        <div class="glass-ui rounded-[32px] p-5 h-[200px] flex flex-col">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h2 class="text-[20px] font-semibold leading-[24px]">${ntT('addAccountCardTitle')}</h2>
-                    <p class="mt-2 text-[#8B93A7] text-[14px] leading-[17px]">${ntT('addAccountCardSub')}</p>
+        <div class="glass-ui rounded-[32px] p-5 h-[200px] mt-1 flex flex-col">
+            <div class="flex justify-between items-start gap-4">
+                <div class="flex-1 min-w-0">
+                    <h2 class="line-clamp-2 text-[20px] font-semibold leading-[24px]">${ntT('addAccountCardTitle')}</h2>
+                    <p class="line-clamp-2 mt-2 text-[#8B93A7] text-[14px] leading-[17px]">${ntT('addAccountCardSub')}</p>
                 </div>
-                ${ntWhiteIcon('back', 56)}
+                <span class="flex-none">${ntWhiteIcon('back', 56)}</span>
             </div>
             <button type="button" onclick="openAccountModal()" class="mt-auto w-full h-[44px] rounded-full glass-ui text-[#F5F7FA] font-semibold text-[16px] leading-[19px] flex items-center justify-center gap-2 active:scale-95 transition-transform">
                 ${SVG_PLUS_16} ${ntT('addAccount')}
@@ -571,7 +572,8 @@ function ntAddCardHTML() {
 }
 
 // --- СЧЕТА: один счёт — карточка на всю ширину; два и больше —
-// карусель 170×190 (сумма сверху, водяной знак по центру, имя снизу).
+// карусель 200×200 (сумма сверху с отступами 20, водяной знак 100px
+// в правом нижнем углу, имя снизу Inter Medium 16/19 с многоточием).
 // Пустой сегмент → карточка Add account ---
 function ntRenderAccounts() {
     ntPaintSeg();
@@ -593,10 +595,10 @@ function ntRenderAccounts() {
         const parts = getMoneyParts(main);
         const sign = (acc.type === 'debt' && main !== 0) || main < 0 ? '−' : '';
         html += `
-            <button type="button" onclick="openAccountDetail('${acc.id}')" class="acc-card ${single ? 'acc-card--single' : ''} glass-ui rounded-[28px] p-4 relative overflow-hidden text-left active:scale-95 transition-transform">
-                <p class="relative text-[20px] font-bold leading-[24px]">${sign}${parts.integer}<span class="text-[#8B93A7] text-[15px] font-semibold">,${parts.decimal} ${sym}</span></p>
-                <div class="acc-card-icon">${ntWhiteIcon(acc.icon, 64)}</div>
-                <p class="relative text-[15px] font-medium leading-[18px] truncate">${acc.name}</p>
+            <button type="button" onclick="openAccountDetail('${acc.id}')" class="acc-card ${single ? 'acc-card--single' : ''} glass-ui rounded-[32px] p-5 relative overflow-hidden text-left active:scale-95 transition-transform">
+                <p class="flex items-baseline text-[24px] font-semibold leading-[29px] text-[#F5F7FA]">${sign}${parts.integer}<span class="text-[#8B93A7] text-[16px] leading-[19px]">,${parts.decimal}</span><span class="text-[#8B93A7] text-[16px] leading-[19px] ml-1">${sym}</span></p>
+                <div class="acc-card-icon">${ntWhiteIcon(acc.icon, 100)}</div>
+                <p class="mt-auto text-[16px] font-medium leading-[19px] text-[#F5F7FA] truncate">${acc.name}</p>
             </button>`;
     });
     if (!single) html += '</div>';
@@ -650,18 +652,19 @@ function ntTxRowHTML(tx) {
     const sign = income ? '+' : '−';
     const time = new Date(tx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     return `
-        <div class="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
-            <div class="flex items-center gap-3 min-w-0">
-                <div class="w-11 h-11 rounded-full bg-[rgba(255,255,255,0.06)] flex items-center justify-center text-white flex-none">${ntWhiteIcon(acc.icon, 20)}</div>
-                <div class="min-w-0">
-                    <p class="font-medium text-[16px] truncate">${acc.name}</p>
-                    <p class="text-[#8B93A7] text-[13px] truncate">${tx.category || ntT('other')}</p>
+        <div class="nt-tx-row relative flex justify-between items-center py-[19.5px]">
+            <div class="flex items-center gap-4 min-w-0">
+                <div class="w-12 h-12 rounded-full bg-[rgba(255,255,255,0.06)] flex items-center justify-center text-white flex-none">${ntWhiteIcon(acc.icon, 24)}</div>
+                <div class="min-w-0 flex flex-col gap-1">
+                    <p class="text-[16px] leading-[19px] truncate">${acc.name}</p>
+                    <p class="text-[#8B93A7] text-[12px] leading-[15px] truncate">${tx.category || ntT('other')}</p>
                 </div>
             </div>
-            <div class="text-right flex-none pl-3">
-                <p class="${color} font-medium text-[16px]">${sign}${formatMoney(tx.amount)} ${ntSym(tx.currency)}</p>
-                <p class="text-[#8B93A7] text-[13px]">${time}</p>
+            <div class="text-right flex-none pl-4 flex flex-col gap-1">
+                <p class="${color} text-[16px] leading-[19px]">${sign}${formatMoney(tx.amount)} ${ntSym(tx.currency)}</p>
+                <p class="text-[#8B93A7] text-[12px] leading-[15px]">${time}</p>
             </div>
+            <div class="nt-tx-divider" aria-hidden="true"></div>
         </div>`;
 }
 
@@ -679,9 +682,9 @@ function ntRenderOperations() {
     block.style.display = 'block';
 
     head.innerHTML = `
-        <button type="button" onclick="switchTab('history')" class="w-full flex justify-between items-center mb-2 active:opacity-70 transition-opacity">
+        <button type="button" onclick="switchTab('history')" class="w-full flex justify-start items-center gap-1 mb-4 active:opacity-70 transition-opacity">
             <h2 class="text-[20px] font-semibold leading-[24px]">${ntT('operations')}</h2>
-            <i class="ph ph-caret-right text-[20px] text-[#8B93A7]"></i>
+            <i class="ph ph-caret-right text-[16px] leading-[16px] text-[#8B93A7]"></i>
         </button>`;
 
     list.innerHTML = '';
@@ -763,12 +766,12 @@ function ntRenderLanguage() {
     const list = document.getElementById('language-list');
     if (!list) return;
     list.innerHTML = NT_LANGS.map(l => `
-        <button type="button" onclick="ntSetLang('${l.code}')" class="w-full flex items-center justify-between py-4 border-b border-white/5 last:border-0 active:opacity-70 transition-opacity">
-            <span class="text-left">
-                <span class="block text-[17px] font-medium">${l.native}</span>
-                <span class="block text-[15px] text-[#8B93A7]">${l.name[ntSettings.lang] || l.name.en}</span>
+        <button type="button" onclick="ntSetLang('${l.code}')" class="nt-opt-row w-full flex items-center gap-4 py-6 text-left active:opacity-70 transition-opacity">
+            <span class="flex-1 min-w-0 flex flex-col gap-1">
+                <span class="text-[16px] leading-[19px] text-[#F5F7FA] truncate">${l.native}</span>
+                <span class="text-[12px] leading-[15px] text-[#8B93A7] truncate">${l.name[ntSettings.lang] || l.name.en}</span>
             </span>
-            ${ntSettings.lang === l.code ? '<i class="ph ph-check text-[22px] text-white"></i>' : ''}
+            ${ntSettings.lang === l.code ? NT_SVG_CHECK : ''}
         </button>`).join('');
 }
 
@@ -783,13 +786,13 @@ function ntRenderCurrency() {
     const list = document.getElementById('currency-list');
     if (!list) return;
     list.innerHTML = NT_CURS.map(c => `
-        <button type="button" onclick="ntSetCurrency('${c.code}')" class="w-full flex items-center gap-3 py-3 border-b border-white/5 last:border-0 active:opacity-70 transition-opacity">
-            <span class="nt-flag">${ntFlagHTML(c)}</span>
-            <span class="flex-1 text-left">
-                <span class="block text-[17px] font-medium">${c.name[ntSettings.lang] || c.name.en}</span>
-                <span class="block text-[15px] text-[#8B93A7]">${c.code}</span>
+        <button type="button" onclick="ntSetCurrency('${c.code}')" class="nt-opt-row w-full flex items-center gap-4 py-[19px] text-left active:opacity-70 transition-opacity">
+            <span class="nt-flag flex-none">${ntFlagHTML(c)}</span>
+            <span class="flex-1 min-w-0 flex flex-col gap-1">
+                <span class="text-[16px] leading-[19px] text-[#F5F7FA] truncate">${c.name[ntSettings.lang] || c.name.en}</span>
+                <span class="text-[12px] leading-[15px] text-[#8B93A7] truncate">${c.code}</span>
             </span>
-            ${ntSettings.currency === c.code ? '<i class="ph ph-check text-[22px] text-white"></i>' : ''}
+            ${ntSettings.currency === c.code ? NT_SVG_CHECK : ''}
         </button>`).join('');
 }
 
@@ -867,7 +870,7 @@ openEditAccount = function (id) {
 function ntSetAccCloseIcon(mode) {
     const btn = document.getElementById('acc-close-btn');
     if (!btn) return;
-    btn.innerHTML = mode === 'back' ? '<i class="ph ph-caret-left text-xl"></i>' : '<i class="ph ph-x text-xl"></i>';
+    btn.innerHTML = mode === 'back' ? '<i class="ph ph-caret-left text-[24px]"></i>' : '<i class="ph ph-x text-[24px]"></i>';
 }
 
 // Пикер иконок: белые глифы на тёмных кругах (по макету),
@@ -879,10 +882,36 @@ renderIconPicker = function () {
     Object.keys(ACCOUNT_ICONS).forEach(key => {
         const isActive = key === selectedIcon;
         const cls = isActive
-            ? 'w-11 h-11 rounded-full bg-[#4C8DFF] text-white flex items-center justify-center active:scale-95 transition-transform'
-            : 'w-11 h-11 rounded-full bg-[rgba(255,255,255,0.06)] text-white flex items-center justify-center active:scale-95 transition-transform';
-        picker.innerHTML += `<button type="button" onclick="setAccIcon('${key}')" class="${cls}">${ntWhiteIcon(key, 20)}</button>`;
+            ? 'w-14 h-14 rounded-full bg-[#4C8DFF] text-white flex items-center justify-center flex-none active:scale-95 transition-transform'
+            : 'w-14 h-14 rounded-full bg-[rgba(255,255,255,0.06)] text-white flex items-center justify-center flex-none active:scale-95 transition-transform';
+        picker.innerHTML += `<button type="button" onclick="setAccIcon('${key}')" class="${cls}">${ntWhiteIcon(key, 24)}</button>`;
     });
+};
+
+// Чипы валют по макету: Medium 16/19, паддинги 12.5×17 (высота 44),
+// неактивный — плоский тёмный без эффектов, текст #F5F7FA
+renderAccCurrencyChips = function () {
+    const box = document.getElementById('acc-currency-chips');
+    if (!box) return;
+    box.innerHTML = '';
+    CURRENCIES.forEach(cur => {
+        const isActive = selectedCurrencies.includes(cur);
+        const cls = isActive
+            ? 'px-[17px] py-[12.5px] rounded-full bg-[#4C8DFF] text-white text-[16px] leading-[19px] font-medium flex items-center gap-2 active:scale-95 transition-transform'
+            : 'px-[17px] py-[12.5px] rounded-full bg-[rgba(255,255,255,0.06)] text-[#F5F7FA] text-[16px] leading-[19px] font-medium flex items-center gap-2 active:scale-95 transition-transform';
+        const cross = isActive ? '<i class="ph ph-x text-[14px]"></i>' : '';
+        box.innerHTML += `<button type="button" onclick="toggleAccCurrency('${cur}')" class="${cls}">${cur} ${cross}</button>`;
+    });
+};
+
+// Disabled Save — плоский градиент, без stroke/теней (.btn-glass-flat)
+const __ntUpdateAccSaveBtn = updateAccSaveBtn;
+updateAccSaveBtn = function () {
+    __ntUpdateAccSaveBtn();
+    const btn = document.getElementById('acc-save-btn');
+    if (!btn) return;
+    const name = document.getElementById('acc-name').value.trim();
+    if (!name.length) btn.className = btn.className.replace('glass-ui', 'btn-glass-flat');
 };
 
 // --- КЛАВИАТУРА iOS: лист уходит ПОД клавиатуру, а не ужимается над ней.
